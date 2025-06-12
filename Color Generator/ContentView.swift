@@ -16,6 +16,10 @@ struct ContentView: View {
 			toolbar
 			
 			selectedPhoto
+			
+			extractColors(vm.intColorCount)
+			
+			colorsDisplay
 		}
 		.onChange(of: vm.selectedPhoto) { old, new in
 			if new == nil {
@@ -39,12 +43,10 @@ extension ContentView {
 		HStack {
 			Spacer ()
 			PhotosPicker(selection: $vm.selectedPhoto, matching: .images) {
-				Label("Select a photo", systemImage: "photo")
-					.font(.system(size: 14))
+				Image(systemName: "camera")
 					.padding()
 					.background(Color(.systemGray6))
 					.clipShape(Capsule())
-					
 			}
 			.buttonStyle(.plain)
 		}
@@ -63,6 +65,7 @@ extension ContentView {
 					.scaledToFit()
 					.frame(width: .infinity, height: 400)
 					.padding(.horizontal)
+				
 			} else {
 				ContentUnavailableView {
 					Label("No image selected", systemImage: "photo.trianglebadge.exclamationmark")
@@ -77,11 +80,47 @@ extension ContentView {
 
 //MARK: Extract colors
 extension ContentView {
-	var extractColors: some View {
-		EmptyView()
+	@ViewBuilder func extractColors (_ colorsNumber: Int) -> some View {
+		VStack {
+			Button {
+				vm.extractColors(vm.intColorCount)
+			} label :{
+				Text ("Extract \(colorsNumber) colors")
+					.padding(64)
+					.overlay {
+						Circle()
+							.stroke(style: .init(lineWidth: 2))
+							.fill(Color(.systemGray4))
+					}
+			}
+			.buttonStyle(.plain)
+			
+			Slider(
+				value: $vm.colorCount,
+				in: 1...5,
+				step: 1,
+				onEditingChanged: {editing in
+				}
+			)
+			
+		}
+		.padding()
 	}
 }
 
+//MARK: Colors display
+extension ContentView {
+	@ViewBuilder var colorsDisplay: some View {
+		ScrollView(.horizontal){
+			HStack {
+				ForEach(vm.extractedColors, id: \.self) {color in
+					Color(color)
+						.frame(width: 100, height: 100)
+				}
+			}
+		}
+	}
+}
 
 #Preview {
 	ContentView()
