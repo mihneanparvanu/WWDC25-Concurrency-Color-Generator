@@ -5,16 +5,17 @@
 //  Created by Mihnea Nicolae Pârvanu on 12.06.2025.
 //
 
-import Foundation
 import Observation
-import SwiftUI
 import PhotosUI
-import CoreImage
+import SwiftData
+import SwiftUI
+
 
 @MainActor
 @Observable
 final class ContentViewViewModel {
-	var selectedPhoto: PhotosPickerItem?
+	let imageProcessor = ImageProcessingSevice()
+	var selectedImage: PhotosPickerItem?
 	var selectedUIImage: UIImage?
 	
 	var colorCount: Double = 5
@@ -22,34 +23,6 @@ final class ContentViewViewModel {
 		Int(colorCount)
 	}
 	var extractedColors: [UIColor] = []
-}
-
-
-
-
-//MARK: Extract data from photo
-extension ContentViewViewModel {
-	func extractData(from photo: PhotosPickerItem) async throws -> Data? {
-		guard let data = try await photo.loadTransferable(type: Data.self) else { return nil }
-		return data
-	}
-}
-
-//MARK: Save photo to context
-
-
-//MARK: Photo selection logic
-extension ContentViewViewModel {
-	func getSelectedPhoto () async throws -> Image? {
-		if let photo = selectedPhoto {
-			if let data = try await extractData(from: photo) {
-				if let uiImage = UIImage(data: data) {
-					return Image(uiImage: uiImage)
-				}
-			}
-		}
-		return nil
-	}
 }
 
 //MARK: Color extraction logic
@@ -61,7 +34,7 @@ extension ContentViewViewModel {
 		
 		if let uiImage = selectedUIImage {
 			extractedColors =
-				uiImage.extractColors(intColorCount)
+			uiImage.extractColors(intColorCount)
 		}
 		
 		if extractedColors != [] {
@@ -70,6 +43,35 @@ extension ContentViewViewModel {
 			print ("No colors extracted")
 		}
 		
+	}
+}
+
+//MARK: Display selected image
+extension ContentViewViewModel {
+	func provideSelectedImage () async throws -> Image? {
+		guard let selectedImage else { return nil }
+		guard let data = try await imageProcessor.extractData(from: selectedImage) else { return nil }
+		guard let uiImage = UIImage(data: data) else { return nil }
+		selectedUIImage = uiImage
+		return Image (uiImage: uiImage)
+	}
+}
+
+//MARK: Save photo to context
+extension ContentViewViewModel {
+	func savePhotoDataToContext (_ context: ModelContext) throws {
+		guard let selectedUIImage else { return }
+		let imageURL = try imageProcessor.saveImageToFiles(image: selectedUIImage)
+		var imageColorHexCodes: [String] = []
+		extractedColors.forEach({color in
+			if let hexString = color.toHex {
+				imageColorHexCodes.append(hexString)
+			}
+		})
+		
+		let processedImage = ProcessedImage(imageURL: imageURL, colorHexCodes: imageColorHexCodes)
+		context.insert(processedImage)
+		try context.save()
 	}
 }
 

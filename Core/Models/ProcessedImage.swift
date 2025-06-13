@@ -10,10 +10,11 @@ import SwiftUI
 
 @Model
 class ProcessedImage {
-	var photoIdentifier: String
-	var colorPalette: [String] = []
+	var imageURL: URL
+	var colorHexCodes: [String]
 	
-	init (photoIdentifier: String){
-		self.photoIdentifier = photoIdentifier
-	}	
+	init (imageURL: URL, colorHexCodes: [String]){
+		self.imageURL = imageURL
+		self.colorHexCodes = colorHexCodes
+	}
 }

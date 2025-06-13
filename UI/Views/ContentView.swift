@@ -5,30 +5,38 @@
 //  Created by Mihnea Nicolae Pârvanu on 11.06.2025.
 //
 
-import SwiftUI
 import PhotosUI
+import SwiftData
+import SwiftUI
+
+
 
 struct ContentView: View {
+	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
 	@State private var vm = ContentViewViewModel()
 	@State private var photo: Image?
 	var body: some View {
-		VStack () {
-			toolbar
-			
-			selectedPhoto
-			
-			extractColors(vm.intColorCount)
-			
-			colorsDisplay
+		ScrollView {
+		toolbar
+		
+		selectedPhoto
+		
+		extractColors(vm.intColorCount)
+		
+		colorsDisplay
+		
+			if images.isNotEmpty {
+				ProcessedImagesView(images: images)
+			}
 		}
-		.onChange(of: vm.selectedPhoto) { old, new in
+		.onChange(of: vm.selectedImage) { old, new in
 			if new == nil {
 				photo = nil
 			}
 			Task {
 				do {
-					photo = try await vm.getSelectedPhoto()
+					photo = try await vm.provideSelectedImage()
 				}
 				catch {
 					photo = nil
@@ -43,7 +51,7 @@ extension ContentView {
 	@ViewBuilder var toolbar: some View {
 		HStack {
 			Spacer ()
-			PhotosPicker(selection: $vm.selectedPhoto, matching: .images) {
+			PhotosPicker(selection: $vm.selectedImage, matching: .images) {
 				Image(systemName: "camera")
 					.padding()
 			}
@@ -62,7 +70,6 @@ extension ContentView {
 				photo
 					.resizable()
 					.scaledToFit()
-					.frame(width: .infinity, height: 400)
 					.padding(.horizontal)
 				
 			} else {
@@ -83,6 +90,7 @@ extension ContentView {
 		VStack {
 			Button {
 				vm.extractColors(vm.intColorCount)
+				try? vm.savePhotoDataToContext(context)
 			} label :{
 				Text ("Extract \(colorsNumber) colors")
 					.padding(64)
@@ -121,6 +129,8 @@ extension ContentView {
 	}
 }
 
+
 #Preview {
 	ContentView()
 }
+
