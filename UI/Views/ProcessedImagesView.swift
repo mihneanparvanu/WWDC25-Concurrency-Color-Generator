@@ -11,46 +11,30 @@ import SwiftUI
 
 struct ProcessedImagesView: View {
 	@State private var vm = ProcessedImagesViewModel()
-	let images: [ProcessedImage]
-
+	var displayImages: [ProcessedImageDisplay]
 	
 	var body: some View {
-		NavigationStack {
+		Text ("Test")
 			VStack (spacing: 32) {
-				ForEach (images, id: \.self) { image in
-					for color in image.colorHexCodes {
-						colors.append(vm.colorFromHex(color))
-					}
-					
-					if let image = vm.retrievePhotoFromURL(image.imageURL) {
-						image
-							.resizable()
-							.scaledToFit()
-							.frame(width: 400, height: 300)
-					}
+				ForEach (displayImages) { display in
+					display.image
+						.resizable()
+						.scaledToFit()
+						.frame(width: 400, height: 300)
 					
 					HStack {
-						ForEach(image.colorHexCodes, id: \.self) {hex in
-							if let color = vm.colorFromHex(hex){
-								
-								Color(color)
-									.frame(width: .infinity, height: 36)
-							}
+						ForEach(display.colors, id: \.self) { color in
+							color
 						}
 					}
-					
 				}
 			}
-				.padding(.horizontal)
-		}
+			.padding(.horizontal)
 	}
 }
 
 
-
-
-
 #Preview {
-	ProcessedImagesView(images: [])
+	ProcessedImagesView(displayImages: [])
 }
 

@@ -15,6 +15,7 @@ struct ContentView: View {
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
 	@State private var vm: ContentViewViewModel
+	@State private var displayImages: [ProcessedImageDisplay] = []
 	@State private var photo: Image?
 	
 	init () {
@@ -33,11 +34,16 @@ struct ContentView: View {
 		extractColors(vm.intColorCount)
 		
 		colorsDisplay
-		
-			if images.isNotEmpty {
-				ProcessedImagesView(images: images)
+			
+			if displayImages.isNotEmpty {
+				ProcessedImagesView(displayImages: displayImages)
 			}
 		}
+		.onAppear {
+			displayImages = vm.prepareImagesForDisplay(images)
+		}
+		
+		
 		.onChange(of: vm.selectedImage) { old, new in
 			if new == nil {
 				photo = nil
@@ -99,6 +105,7 @@ extension ContentView {
 			Button {
 				vm.extractColors(vm.intColorCount)
 				try? vm.savePhotoDataToContext(context)
+				displayImages = vm.prepareImagesForDisplay(images)
 			} label :{
 				Text ("Extract \(colorsNumber) colors")
 					.padding(64)

@@ -45,12 +45,5 @@ struct ImageProcessingSevice: ImageProcessor {
 		}
 		return fileURL
 	}
-	
-	func loadImageFromFiles(at url: URL) throws -> UIImage? {
-		print ("attempting to retrieve image from \(url.path)")
-		let fileManager = FileManager.default
-		print(fileManager.fileExists(atPath: url.path))
-		let data = try Data(contentsOf: url)
-		return UIImage(data: data)
-	}
 }
+
