@@ -12,11 +12,16 @@ import SwiftUI
 @MainActor
 @Observable
 final class ProcessedImagesViewModel {
-	let imageProcessor = ImageProcessingSevice()
+	let imageProcessor: ImageProcessor
+	
+	init(imageProcessor: ImageProcessor) {
+		self.imageProcessor = imageProcessor
+	}
+
 	
 	//MARK: Retrieve photo from URL
 	func retrievePhotoFromURL (_ url: URL) -> Image? {
-		if let uiImage = try? imageProcessor.retrieveImageFromFiles(imageURL: url) {
+		if let uiImage = try? imageProcessor.loadImageFromFiles(at: url) {
 			return Image(uiImage: uiImage)
 		} else {
 			return nil

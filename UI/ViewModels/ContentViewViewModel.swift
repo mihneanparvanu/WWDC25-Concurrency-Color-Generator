@@ -14,7 +14,12 @@ import SwiftUI
 @MainActor
 @Observable
 final class ContentViewViewModel {
-	let imageProcessor = ImageProcessingSevice()
+	let imageProcessor: ImageProcessor
+	
+	init(imageProcessor: ImageProcessor) {
+		self.imageProcessor = imageProcessor
+	}
+	
 	var selectedImage: PhotosPickerItem?
 	var selectedUIImage: UIImage?
 	
@@ -29,20 +34,13 @@ final class ContentViewViewModel {
 extension ContentViewViewModel {
 	func extractColors(_ colors: Int){
 		
-		//Clear previous extracted colors
+		//Clear previous colors
 		extractedColors = []
 		
 		if let uiImage = selectedUIImage {
 			extractedColors =
 			uiImage.extractColors(intColorCount)
 		}
-		
-		if extractedColors != [] {
-			print ("Extracted colors: \(extractedColors)")
-		} else {
-			print ("No colors extracted")
-		}
-		
 	}
 }
 

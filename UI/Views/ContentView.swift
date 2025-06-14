@@ -14,8 +14,16 @@ import SwiftUI
 struct ContentView: View {
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
-	@State private var vm = ContentViewViewModel()
+	@State private var vm: ContentViewViewModel
 	@State private var photo: Image?
+	
+	init () {
+		let imageProcessor = ImageProcessingSevice()
+		self._vm = .init(
+			initialValue: ContentViewViewModel(imageProcessor: imageProcessor)
+		)
+	}
+	
 	var body: some View {
 		ScrollView {
 		toolbar

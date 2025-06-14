@@ -8,7 +8,8 @@
 import SwiftUI
 import PhotosUI
 
-struct ImageProcessingSevice {
+
+struct ImageProcessingSevice: ImageProcessor {
 	func extractData (from photo: PhotosPickerItem) async throws -> Data? {
 		return try? await photo.loadTransferable(type: Data.self)
 	}
@@ -45,11 +46,11 @@ struct ImageProcessingSevice {
 		return fileURL
 	}
 	
-	func retrieveImageFromFiles(imageURL: URL) throws -> UIImage? {
-		print ("attempting to retrieve image from \(imageURL.path)")
+	func loadImageFromFiles(at url: URL) throws -> UIImage? {
+		print ("attempting to retrieve image from \(url.path)")
 		let fileManager = FileManager.default
-		print(fileManager.fileExists(atPath: imageURL.path))
-		let data = try Data(contentsOf: imageURL)
+		print(fileManager.fileExists(atPath: url.path))
+		let data = try Data(contentsOf: url)
 		return UIImage(data: data)
 	}
 }
