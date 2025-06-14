@@ -52,4 +52,13 @@ struct ProcessedImageDisplay: Identifiable {
 				return nil
 		}
 	}
+	
+	static let preview = ProcessedImageDisplay(
+		processedImage: ProcessedImage(
+			imageURL: URL(fileURLWithPath: "/dev/null"),
+			colorHexCodes: ["#D687F4", "#6495F9", "#4BF1B0"]
+		)
+	)
 }
+
+

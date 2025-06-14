@@ -10,7 +10,6 @@ import SwiftData
 import SwiftUI
 
 
-
 struct ContentView: View {
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
@@ -26,23 +25,28 @@ struct ContentView: View {
 	}
 	
 	var body: some View {
-		ScrollView {
-		toolbar
 		
-		selectedPhoto
-		
-		extractColors(vm.intColorCount)
-		
-		colorsDisplay
+		NavigationStack {
+			ScrollView {
+			toolbar
 			
-			if displayImages.isNotEmpty {
-				ProcessedImagesView(displayImages: displayImages)
+			selectedPhoto
+			
+			extractColors(vm.intColorCount)
+			
+			colorsDisplay
+				
+				if displayImages.isNotEmpty {
+					storedImages
+				}
 			}
 		}
 		.onAppear {
 			displayImages = vm.prepareImagesForDisplay(images)
 		}
-		
+		.onChange (of: images) {
+			displayImages = vm.prepareImagesForDisplay(images)
+		}
 		
 		.onChange(of: vm.selectedImage) { old, new in
 			if new == nil {
@@ -139,6 +143,24 @@ extension ContentView {
 					Color(color)
 						.frame(width: 100, height: 100)
 				}
+			}
+		}
+	}
+}
+
+//MARK: List of stored images
+extension ContentView {
+	@ViewBuilder var storedImages: some View {
+		VStack (spacing: 32) {
+			ForEach (displayImages) { displayImage in
+				NavigationLink (
+					destination: ProcessedImageDetailView(
+						displayImage: displayImage
+					)
+				){
+					ImageCard(displayImage: displayImage)
+				}
+				
 			}
 		}
 	}

@@ -8,29 +8,60 @@
 import SwiftUI
 
 struct ProcessedImageDetailView: View {
-	let image: Image?
-	let colors: [Color]
-	
-	init(image: Image? = nil, colors: [Color] = []) {
-		self.image = image
-		self.colors = colors
-	}
-	
+	@Environment(\.modelContext) var context
+	@Environment(\.dismiss) var dismiss
+	let displayImage: ProcessedImageDisplay
 	var body: some View {
-		VStack {
-			image
-			
-			HStack {
-				ForEach(colors, id: \.self) { color in
-					Color(color)
-						.frame(width: .infinity)
-				}
-			}
-		}
+		ImageCard(displayImage: displayImage,
+				  width: 350)
+		
+		
+		buttons
+		
 	}
 }
+
+//MARK: Buttons
+extension ProcessedImageDetailView {
+	var buttons: some View {
+		
+		HStack (spacing: 16){
+			Button {
+				
+			} label: {
+				buttonLabel(systemName: "pencil", color: .gray)
+			}
+			
+			
+			Button {
+				
+				context.delete(displayImage.processedImage)
+				print (context.hasChanges)
+				
+				try? context.save()
+				dismiss()
+			} label: {
+				buttonLabel()
+			}
+		}
+		.buttonStyle(.glass)
+	}
+	
+	@ViewBuilder func buttonLabel (systemName: String = "trash.fill", color: Color = .red) -> some View {
+		Image(systemName: systemName)
+		 .padding()
+		 .background(color.opacity(0.1))
+		 .clipShape(Circle())
+		 .foregroundStyle(color)
+	}
+	
+}
+
 
 
 #Preview {
-	ProcessedImageDetailView()
+	ProcessedImageDetailView(
+		displayImage: ProcessedImageDisplay.preview
+	).buttons
 }
+
