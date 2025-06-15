@@ -14,7 +14,6 @@ struct ContentView: View {
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
 	@State private var vm: ContentViewViewModel
-	@State private var displayImages: [ProcessedImageDisplay] = []
 	@State private var photo: Image?
 	
 	init () {
@@ -36,29 +35,12 @@ struct ContentView: View {
 			
 			colorsDisplay
 				
-				if displayImages.isNotEmpty {
-					storedImages
-				}
+			storedImages
 			}
 		}
-		.onAppear {
-			displayImages = vm.prepareImagesForDisplay(images)
-		}
-		.onChange (of: images) {
-			displayImages = vm.prepareImagesForDisplay(images)
-		}
-		
-		.onChange(of: vm.selectedImage) { old, new in
-			if new == nil {
-				photo = nil
-			}
+		.onChange(of: vm.selectedImage) {
 			Task {
-				do {
-					photo = try await vm.provideSelectedImage()
-				}
-				catch {
-					photo = nil
-				}
+				try await photo = vm.provideSelectedImage()
 			}
 		}
 	}
@@ -109,7 +91,6 @@ extension ContentView {
 			Button {
 				vm.extractColors(vm.intColorCount)
 				try? vm.savePhotoDataToContext(context)
-				displayImages = vm.prepareImagesForDisplay(images)
 			} label :{
 				Text ("Extract \(colorsNumber) colors")
 					.padding(64)
@@ -152,19 +133,24 @@ extension ContentView {
 extension ContentView {
 	@ViewBuilder var storedImages: some View {
 		VStack (spacing: 32) {
-			ForEach (displayImages) { displayImage in
+			ForEach (images) { image in
 				NavigationLink (
 					destination: ProcessedImageDetailView(
-						displayImage: displayImage
+						image: image
 					)
 				){
-					ImageCard(displayImage: displayImage)
+					ImageCard(
+						displayImage: ProcessedImageDisplay(
+							processedImage: image
+						)
+					)
 				}
 				
 			}
 		}
 	}
 }
+
 
 
 #Preview {

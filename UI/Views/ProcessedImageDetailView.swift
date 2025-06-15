@@ -10,11 +10,17 @@ import SwiftUI
 struct ProcessedImageDetailView: View {
 	@Environment(\.modelContext) var context
 	@Environment(\.dismiss) var dismiss
-	let displayImage: ProcessedImageDisplay
+	var image: ProcessedImage
 	var body: some View {
 		ImageCard(displayImage: displayImage,
 				  width: 350)
-		
+
+		HStack {
+			ForEach (displayImage.colors, id: \.self) { color in
+				color
+					.frame(width: .infinity, height: 32)
+			}
+		}
 		
 		buttons
 		
@@ -35,7 +41,7 @@ extension ProcessedImageDetailView {
 			
 			Button {
 				
-				context.delete(displayImage.processedImage)
+				context.delete(image)
 				print (context.hasChanges)
 				
 				try? context.save()
@@ -57,11 +63,12 @@ extension ProcessedImageDetailView {
 	
 }
 
-
-
-#Preview {
-	ProcessedImageDetailView(
-		displayImage: ProcessedImageDisplay.preview
-	).buttons
+extension ProcessedImageDetailView {
+	var displayImage: ProcessedImageDisplay {
+		ProcessedImageDisplay(processedImage: image)
+	}
 }
+
+
+
 
