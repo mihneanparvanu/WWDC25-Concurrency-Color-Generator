@@ -15,12 +15,6 @@ struct ProcessedImageDetailView: View {
 		ImageCard(displayImage: displayImage,
 				  width: 350)
 
-		HStack {
-			ForEach (displayImage.colors, id: \.self) { color in
-				color
-					.frame(width: .infinity, height: 32)
-			}
-		}
 		
 		buttons
 		

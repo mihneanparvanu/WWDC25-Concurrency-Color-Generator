@@ -39,9 +39,7 @@ struct ContentView: View {
 			}
 		}
 		.onChange(of: vm.selectedImage) {
-			Task {
-				try await photo = vm.provideSelectedImage()
-			}
+			awaitDisplayingImage()
 		}
 	}
 }
@@ -147,6 +145,14 @@ extension ContentView {
 				}
 				
 			}
+		}
+	}
+}
+
+extension ContentView {
+	func awaitDisplayingImage () {
+		Task {
+			try await photo = vm.provideSelectedImage()
 		}
 	}
 }
