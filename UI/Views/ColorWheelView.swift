@@ -10,6 +10,14 @@ import SwiftUI
 struct ColorWheelView: View {
 	let colors: [Color]
 	let innerRadiusRatio: CGFloat
+	@State private var animatedIndices: [Bool]
+	
+	init(colors: [Color], innerRadiusRatio: CGFloat) {
+		self.colors = colors
+		self.innerRadiusRatio = innerRadiusRatio
+		_animatedIndices = State(initialValue: Array(repeating: false, count: colors.count))
+	}
+	
     var body: some View {
 		ZStack {
 			ForEach(colors.indices, id: \.self) { index in
@@ -22,7 +30,17 @@ struct ColorWheelView: View {
 					endAngle: endAngle,
 					innerRadiusRatio: innerRadiusRatio
 				)
+				
 				.fill(colors[index])
+				.opacity(animatedIndices[index] ? 1 : 0)
+				.scaleEffect(animatedIndices[index] ? 1 : 0.2, anchor: .center)
+				.task {
+					try? await Task
+						.sleep(nanoseconds: UInt64(index) * 100_000_000)
+					withAnimation(animation) {
+						animatedIndices[index] = true
+					}
+				}
 			}
 		}
     }
@@ -36,7 +54,15 @@ extension ColorWheelView {
 	}
 }
 
-//MARK: Custom Shape
+//MARK: Animation
+extension ColorWheelView {
+	var animation: Animation {
+		.bouncy(duration: 0.6)
+	}
+}
+
+
+//MARK: Wedge Shape
 struct WheelSegment: Shape {
 	let startAngle: Angle
 	let endAngle: Angle
@@ -63,7 +89,6 @@ struct WheelSegment: Shape {
 				clockwise: true
 			)
 		path.closeSubpath()
-		
 		return path
 	}
 }
@@ -72,3 +97,4 @@ struct WheelSegment: Shape {
 #Preview {
 	ColorWheelView(colors: [.red, .yellow, .blue], innerRadiusRatio: 0)
 }
+
