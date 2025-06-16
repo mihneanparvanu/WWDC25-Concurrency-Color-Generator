@@ -20,7 +20,11 @@ final class ContentViewViewModel {
 		self.imageProcessor = imageProcessor
 	}
 	
-	var selectedImage: PhotosPickerItem?
+	var selectedImage: PhotosPickerItem? {
+		didSet {
+			extractedColors = []
+		}
+	}
 	var selectedUIImage: UIImage?
 	
 	var colorCount: Double = 5

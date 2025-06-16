@@ -92,8 +92,10 @@ extension ContentView {
 	@ViewBuilder func extractColors () -> some View {
 		 VStack {
 			ZStack {
-				ColorWheelView(colors: vm.extractedColors)
-					.frame(width: 256, height: 256)
+				if vm.extractedColors.isNotEmpty {
+					ColorWheelView(colors: vm.extractedColors)
+						.frame(width: 256, height: 256)
+				}
 				
 				extractButton
 			}

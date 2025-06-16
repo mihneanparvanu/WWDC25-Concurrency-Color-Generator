@@ -10,7 +10,7 @@ import SwiftUI
 struct ColorWheelView: View {
 	let colors: [Color]
 	let innerRadiusRatio: CGFloat
-	@State private var isAnimating = false
+	@State private var shouldAnimate = false
 	@Environment(\.uiConstants) private var ui
 	
 	init (colors: [Color], innerRadiusRatio: CGFloat = 0) {
@@ -32,12 +32,12 @@ struct ColorWheelView: View {
 				)
 				
 				.fill(colors[index])
-				.opacity(isAnimating ? 1 : 0)
-				.scaleEffect(isAnimating ? 1 : 0.2, anchor: .center)
+				.opacity(shouldAnimate ? 1 : 0)
+				.scaleEffect(shouldAnimate ? 1 : 0.2, anchor: .center)
 				.animation(animation.delay(indexFloat * 0.2),
-						   value: isAnimating)
+						   value: shouldAnimate)
 				.onAppear() {
-					isAnimating = true
+					shouldAnimate = true
 				}
 			}
 		}
