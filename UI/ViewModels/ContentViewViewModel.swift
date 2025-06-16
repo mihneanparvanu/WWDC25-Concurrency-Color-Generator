@@ -27,7 +27,7 @@ final class ContentViewViewModel {
 	var intColorCount: Int {
 		Int(colorCount)
 	}
-	var extractedColors: [UIColor] = []
+	var extractedColors: [Color] = []
 }
 
 //MARK: Color extraction logic
@@ -38,8 +38,8 @@ extension ContentViewViewModel {
 		extractedColors = []
 		
 		if let uiImage = selectedUIImage {
-			extractedColors =
-			uiImage.extractColors(intColorCount)
+			let extractedUIColors = uiImage.extractColors(intColorCount)
+			extractedColors = extractedUIColors.map{Color($0)}
 		}
 	}
 }

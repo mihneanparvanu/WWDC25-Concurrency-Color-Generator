@@ -33,7 +33,7 @@ struct ContentView: View {
 			
 			extractColors(vm.intColorCount)
 			
-			colorsDisplay
+			ColorsBlockView(colors: vm.extractedColors)
 				
 			storedImages
 			}
@@ -65,11 +65,13 @@ extension ContentView {
 	var selectedPhoto: some View {
 		Group {
 			if let photo {
-				photo
-					.resizable()
-					.scaledToFit()
-					.padding(.horizontal)
-				
+				withAnimation(.bouncy){
+					photo
+						.resizable()
+						.scaledToFit()
+						.padding(.horizontal)
+						
+				}
 			} else {
 				ContentUnavailableView {
 					Label("No image selected", systemImage: "photo.trianglebadge.exclamationmark")
@@ -114,18 +116,34 @@ extension ContentView {
 }
 
 //MARK: Colors display
-extension ContentView {
-	@ViewBuilder var colorsDisplay: some View {
+struct ColorsBlockView: View {
+	@State var animateColors: Bool = false
+	let animation: Animation = .easeInOut(duration: 1.5)
+	let colors: [Color]
+	var body: some View {
 		ScrollView(.horizontal){
 			HStack {
-				ForEach(vm.extractedColors, id: \.self) {color in
-					Color(color)
+				ForEach(colors, id: \.self) {color in
+					color
+						.opacity(animateColors ? 1 : 0)
+						.scaleEffect(animateColors ? 1 : 0.3)
 						.frame(width: 100, height: 100)
+						.onAppear {
+							withAnimation(animation){
+								animateColors = true
+							}
+						}
+						.onDisappear {
+							withAnimation(animation){
+								animateColors = false
+							}
+						}
 				}
 			}
 		}
 	}
 }
+
 
 //MARK: List of stored images
 extension ContentView {
