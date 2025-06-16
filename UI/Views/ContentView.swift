@@ -31,15 +31,10 @@ struct ContentView: View {
 			
 			selectedPhoto
 			
-			extractColors(vm.intColorCount)
-			
-			ColorsBlockView(colors: vm.extractedColors)
-				
+			extractColors()
+							
 			storedImages
 			}
-		}
-		.onChange(of: vm.selectedImage) {
-			awaitDisplayingImage()
 		}
 	}
 }
@@ -70,7 +65,6 @@ extension ContentView {
 						.resizable()
 						.scaledToFit()
 						.padding(.horizontal)
-						
 				}
 			} else {
 				ContentUnavailableView {
@@ -81,26 +75,28 @@ extension ContentView {
 			}
 		}
 		.frame(maxHeight: .infinity)
+		.onChange(of: vm.selectedImage) {
+			awaitDisplayingImage()
+		}
+	}
+	
+	func awaitDisplayingImage () {
+		Task {
+			try await photo = vm.provideSelectedImage()
+		}
 	}
 }
 
 //MARK: Extract colors
 extension ContentView {
-	@ViewBuilder func extractColors (_ colorsNumber: Int) -> some View {
-		VStack {
-			Button {
-				vm.extractColors(vm.intColorCount)
-				try? vm.savePhotoDataToContext(context)
-			} label :{
-				Text ("Extract \(colorsNumber) colors")
-					.padding(64)
-					.overlay {
-						Circle()
-							.stroke(style: .init(lineWidth: 2))
-							.fill(Color(.systemGray4))
-					}
+	@ViewBuilder func extractColors () -> some View {
+		 VStack {
+			ZStack {
+				ColorWheelView(colors: vm.extractedColors)
+					.frame(width: 256, height: 256)
+				
+				extractButton
 			}
-			.buttonStyle(.glass)
 			
 			Slider(
 				value: $vm.colorCount,
@@ -109,46 +105,36 @@ extension ContentView {
 				onEditingChanged: {editing in
 				}
 			)
-			
 		}
 		.padding()
-	}
-}
-
-//MARK: Colors display
-struct ColorsBlockView: View {
-	@State var animateColors: Bool = false
-	let animation: Animation = .easeInOut(duration: 1.5)
-	let colors: [Color]
-	var body: some View {
-		ScrollView(.horizontal){
-			HStack {
-				ForEach(colors, id: \.self) {color in
-					color
-						.opacity(animateColors ? 1 : 0)
-						.scaleEffect(animateColors ? 1 : 0.3)
-						.frame(width: 100, height: 100)
-						.onAppear {
-							withAnimation(animation){
-								animateColors = true
-							}
-						}
-						.onDisappear {
-							withAnimation(animation){
-								animateColors = false
-							}
-						}
-				}
-			}
 		}
+	
+	var colorsCount: Int {
+		vm.intColorCount
+	}
+	
+	var extractButton: some View {
+		var colorsString: String {
+			colorsCount == 1 ? "color" : "colors"
+		}
+		return Button {
+			vm.extractColors(vm.intColorCount)
+			try? vm.savePhotoDataToContext(context)
+		} label :{
+			Text ("Extract \(colorsCount) \(colorsString)")
+				.font(.system(size: 15))
+				.padding()
+				.frame(width: 128, height: 128)
+		}
+		.buttonStyle(.glass)
+		.disabled(photo == nil)
 	}
 }
-
 
 //MARK: List of stored images
 extension ContentView {
 	@ViewBuilder var storedImages: some View {
-		VStack (spacing: 32) {
+		LazyVStack (spacing: 32) {
 			ForEach (images) { image in
 				NavigationLink (
 					destination: ProcessedImageDetailView(
@@ -166,15 +152,6 @@ extension ContentView {
 		}
 	}
 }
-
-extension ContentView {
-	func awaitDisplayingImage () {
-		Task {
-			try await photo = vm.provideSelectedImage()
-		}
-	}
-}
-
 
 
 #Preview {

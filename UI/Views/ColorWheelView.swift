@@ -10,15 +10,15 @@ import SwiftUI
 struct ColorWheelView: View {
 	let colors: [Color]
 	let innerRadiusRatio: CGFloat
-	@State private var animatedIndices: [Bool]
+	@State private var isAnimating = false
+	@Environment(\.uiConstants) private var ui
 	
-	init(colors: [Color], innerRadiusRatio: CGFloat) {
+	init (colors: [Color], innerRadiusRatio: CGFloat = 0) {
 		self.colors = colors
 		self.innerRadiusRatio = innerRadiusRatio
-		_animatedIndices = State(initialValue: Array(repeating: false, count: colors.count))
 	}
 	
-    var body: some View {
+	var body: some View {
 		ZStack {
 			ForEach(colors.indices, id: \.self) { index in
 				let indexFloat = Double(index)
@@ -32,18 +32,16 @@ struct ColorWheelView: View {
 				)
 				
 				.fill(colors[index])
-				.opacity(animatedIndices[index] ? 1 : 0)
-				.scaleEffect(animatedIndices[index] ? 1 : 0.2, anchor: .center)
-				.task {
-					try? await Task
-						.sleep(nanoseconds: UInt64(index) * 100_000_000)
-					withAnimation(animation) {
-						animatedIndices[index] = true
-					}
+				.opacity(isAnimating ? 1 : 0)
+				.scaleEffect(isAnimating ? 1 : 0.2, anchor: .center)
+				.animation(animation.delay(indexFloat * 0.2),
+						   value: isAnimating)
+				.onAppear() {
+					isAnimating = true
 				}
 			}
 		}
-    }
+	}
 }
 
 //MARK: Degrees per segment
@@ -57,10 +55,9 @@ extension ColorWheelView {
 //MARK: Animation
 extension ColorWheelView {
 	var animation: Animation {
-		.bouncy(duration: 0.6)
+		ui.animations.appearAnimation
 	}
 }
-
 
 //MARK: Wedge Shape
 struct WheelSegment: Shape {
@@ -75,19 +72,19 @@ struct WheelSegment: Shape {
 		
 		var path = Path()
 		path.addArc(
-				center: center,
-				radius: radius,
-				startAngle: startAngle,
-				endAngle: endAngle,
-				clockwise: false
-			)
+			center: center,
+			radius: radius,
+			startAngle: startAngle,
+			endAngle: endAngle,
+			clockwise: false
+		)
 		path.addArc(
-				center: center,
-				radius: innerRadius,
-				startAngle: endAngle,
-				endAngle: startAngle,
-				clockwise: true
-			)
+			center: center,
+			radius: innerRadius,
+			startAngle: endAngle,
+			endAngle: startAngle,
+			clockwise: true
+		)
 		path.closeSubpath()
 		return path
 	}

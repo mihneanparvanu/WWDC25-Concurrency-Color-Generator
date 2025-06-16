@@ -15,7 +15,6 @@ struct ProcessedImageDetailView: View {
 		ImageCard(displayImage: displayImage,
 				  width: 350)
 
-		
 		buttons
 		
 	}
