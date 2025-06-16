@@ -60,12 +60,10 @@ extension ContentView {
 	var selectedPhoto: some View {
 		Group {
 			if let photo {
-				withAnimation(.bouncy){
 					photo
 						.resizable()
 						.scaledToFit()
 						.padding(.horizontal)
-				}
 			} else {
 				ContentUnavailableView {
 					Label("No image selected", systemImage: "photo.trianglebadge.exclamationmark")
@@ -92,10 +90,13 @@ extension ContentView {
 	@ViewBuilder func extractColors () -> some View {
 		 VStack {
 			ZStack {
-				if vm.extractedColors.isNotEmpty {
-					ColorWheelView(colors: vm.extractedColors)
-						.frame(width: 256, height: 256)
+				Group {
+					if vm.extractedColors.isNotEmpty {
+						ColorWheelView(colors: vm.extractedColors)
+							
+					}
 				}
+					.frame(width: 256, height: 256)
 				
 				extractButton
 			}
