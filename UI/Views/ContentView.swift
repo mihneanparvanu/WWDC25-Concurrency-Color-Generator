@@ -90,16 +90,23 @@ extension ContentView {
 	@ViewBuilder func extractColors () -> some View {
 		 VStack {
 			ZStack {
-				Group {
 					if vm.extractedColors.isNotEmpty {
 						ColorWheelView(colors: vm.extractedColors)
-							
 					}
-				}
-					.frame(width: 256, height: 256)
-				
-				extractButton
+
+				ExtractColorsButton(
+					action: {
+						Task {
+							try? await vm.extractColors(vm.intColorCount)
+							try? vm.savePhotoDataToContext(context)
+						}
+					},
+					colorsCount: colorsCount,
+					disabled: photo == nil,
+					isLoading: vm.isColorExtractionInProgress
+				)
 			}
+			.frame(width: 256, height: 256)
 			
 			Slider(
 				value: $vm.colorCount,
@@ -114,24 +121,7 @@ extension ContentView {
 	
 	var colorsCount: Int {
 		vm.intColorCount
-	}
-	
-	var extractButton: some View {
-		var colorsString: String {
-			colorsCount == 1 ? "color" : "colors"
-		}
-		return Button {
-			vm.extractColors(vm.intColorCount)
-			try? vm.savePhotoDataToContext(context)
-		} label :{
-			Text ("Extract \(colorsCount) \(colorsString)")
-				.font(.system(size: 15))
-				.padding()
-				.frame(width: 128, height: 128)
-		}
-		.buttonStyle(.glass)
-		.disabled(photo == nil)
-	}
+	}	
 }
 
 //MARK: List of stored images

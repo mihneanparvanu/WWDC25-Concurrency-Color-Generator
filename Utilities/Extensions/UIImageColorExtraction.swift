@@ -10,7 +10,7 @@ import CoreImage
 import CoreImage.CIFilterBuiltins
 
 extension UIImage {
-	func extractColors(_ count: Int) -> [UIColor] {
+	func extractColors(_ count: Int) async throws -> [UIColor] {
 		guard let ciImage = CIImage(image: self) else {
 			return []
 		}
@@ -44,8 +44,6 @@ extension UIImage {
 		//Extract the colors from the palettized image
 		
 		let downscaleSize = 64
-	
-		
 		let width = downscaleSize
 		let height = downscaleSize
 		let bytesPerPixel = 4 // Assuming RGBA
@@ -61,18 +59,16 @@ extension UIImage {
 											bitsPerComponent: bitsPerComponent,
 											bytesPerRow: bytesPerRow,
 											space: CGColorSpaceCreateDeviceRGB(),
-											bitmapInfo: bitmapInfo) else {
-			print("ColorExtractor: Failed to create CGContext for pixel extraction.")
+											bitmapInfo: bitmapInfo)
+		else {
 			return []
 		}
 		
 		renderContext.draw(cgImage, in: CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height)))
 		
-		// Use a Set to store unique UIColors for efficient duplicate checking
 		var uniqueColorsSet: Set<UIColor> = []
 		var extractedColors: [UIColor] = [] // Maintain order of appearance
 		
-		// Iterate through pixels and collect unique colors
 		for y in 0..<height {
 			for x in 0..<width {
 				
@@ -90,7 +86,6 @@ extension UIImage {
 				let color = UIColor(red: r, green: g, blue: b, alpha: 1.0)
 				
 				// Use a very small tolerance here, as the palettized image should have
-				// exact color values for its palette colors. This guards against floating point errors.
 				if !uniqueColorsSet.contains(where: { $0.isVisuallySimilar(to: color, tolerance: 0.0001) }) {
 					uniqueColorsSet.insert(color)
 					extractedColors.append(color)
@@ -116,5 +111,27 @@ extension UIColor {
 		
 		let distance = sqrt(dr*dr + dg*dg + db*db)
 		return distance < tolerance
+	}
+}
+
+
+enum ColorExtractionError: Error {
+	case coreImageCreationFailed, kmeansFilterFailed, paletteGenerationFailed, cgImageConversionFailed, contextRenderingFailed, unknown
+	
+	var localizedDescription: String  {
+		switch self {
+				case .coreImageCreationFailed:
+				return "Failed to create CoreImage context."
+			case .kmeansFilterFailed:
+				return "Failed to apply K-Means clustering filter."
+			case .paletteGenerationFailed:
+				return "Failed to generate color palette."
+			case .cgImageConversionFailed:
+				return "Failed to convert CGImage."
+			case .contextRenderingFailed:
+				return "Failed to render context."
+			case .unknown:
+				return "Unknown error."
+		}
 	}
 }

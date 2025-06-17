@@ -32,30 +32,66 @@ final class ContentViewViewModel {
 		Int(colorCount)
 	}
 	var extractedColors: [Color] = []
+	
+	var isColorExtractionInProgress: Bool = false
 }
 
 //MARK: Color extraction logic
 extension ContentViewViewModel {
-	func extractColors(_ colors: Int){
-		
+	func extractColors (_ colors: Int) async throws {
+		isColorExtractionInProgress = true
+		defer {
+			isColorExtractionInProgress = false
+		}
 		//Clear previous colors
 		extractedColors = []
 		
-		if let uiImage = selectedUIImage {
-			let extractedUIColors = uiImage.extractColors(intColorCount)
-			extractedColors = extractedUIColors.map{Color($0)}
+		guard let uiImage = selectedUIImage else {
+			throw ColorExtractionError.noImageSelected
 		}
+		do {
+			let extractedUIColors = try await uiImage.extractColors(intColorCount)
+		}
+		
+		catch let error as ColorExtractionError {
+			throw error
+		}
+		
+			extractedColors = extractedUIColors.map{Color($0)}
+		
 	}
 }
 
 //MARK: Display selected image
 extension ContentViewViewModel {
 	func provideSelectedImage () async throws -> Image? {
-		guard let selectedImage else { return nil }
-		guard let data = try await imageProcessor.extractData(from: selectedImage) else { return nil }
-		guard let uiImage = UIImage(data: data) else { return nil }
-		selectedUIImage = uiImage
-		return Image (uiImage: uiImage)
+		guard let selectedImage else {
+			throw ImageSelectionError.notFound
+		}
+		do {
+			guard let data = try await imageProcessor.extractData(from: selectedImage) else {
+				throw ImageSelectionError.timeout
+			}
+			
+			if data.count > 50_000_000 {
+				throw ImageSelectionError.tooLarge
+			}
+			
+			guard let uiImage = UIImage(data: data) else {
+				throw ImageSelectionError.unsupportedFormat
+			}
+			
+			selectedUIImage = uiImage
+			return Image (uiImage: uiImage)
+			
+		}
+		catch let error as ImageSelectionError {
+			throw error
+		}
+		
+		catch {
+			throw ImageSelectionError.unknown
+		}
 	}
 }
 
@@ -89,5 +125,53 @@ extension ContentViewViewModel {
 	}
 }
 
+enum ImageSelectionError: Error {
+	case unsupportedFormat, notFound, timeout, tooLarge, unknown
+	
+	var localizedDescription: String {
+		switch self {
+			case .unsupportedFormat:
+				return "The selected image format is unsupported."
+			case .notFound:
+				return "The selected image was not found."
+			case .timeout:
+				return "The request timed out."
+			case .tooLarge:
+				return "The selected image is too large."
+			case .unknown:
+				return "Unknown error."
+		}
+	}
+	
+	var title: String {
+		switch self {
+			case .unsupportedFormat:
+				return "Unsupported format"
+			case .notFound:
+				return "Not found"
+			case .timeout:
+				return "Timeout"
+			case .tooLarge:
+				return "Too large"
+			case .unknown:
+				return "Unknown"
+		}
+	}
+	
+	var userAction: String {
+		switch self {
+			case .unsupportedFormat:
+				return "Please select an image with a JPEG, PNG, or GIF format."
+			case .notFound:
+				return "Please select another image."
+			case .timeout:
+				return "Please try again."
+			case .tooLarge:
+				return "Please select a smaller image."
+			case .unknown:
+				return "Please try again."
+		}
+	}
+}
 
 
