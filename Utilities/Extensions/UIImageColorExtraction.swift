@@ -116,10 +116,12 @@ extension UIColor {
 
 
 enum ColorExtractionError: Error {
-	case coreImageCreationFailed, kmeansFilterFailed, paletteGenerationFailed, cgImageConversionFailed, contextRenderingFailed, unknown
+	case noImageFound, coreImageCreationFailed, kmeansFilterFailed, paletteGenerationFailed, cgImageConversionFailed, contextRenderingFailed, unknown
 	
 	var localizedDescription: String  {
 		switch self {
+			case .noImageFound:
+				return "No image found."
 				case .coreImageCreationFailed:
 				return "Failed to create CoreImage context."
 			case .kmeansFilterFailed:

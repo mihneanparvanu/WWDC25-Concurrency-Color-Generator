@@ -39,25 +39,31 @@ final class ContentViewViewModel {
 //MARK: Color extraction logic
 extension ContentViewViewModel {
 	func extractColors (_ colors: Int) async throws {
+		guard let uiImage = selectedUIImage else {
+			throw ColorExtractionError.noImageFound
+		}
+		
 		isColorExtractionInProgress = true
 		defer {
 			isColorExtractionInProgress = false
 		}
+		
 		//Clear previous colors
 		extractedColors = []
 		
-		guard let uiImage = selectedUIImage else {
-			throw ColorExtractionError.noImageSelected
-		}
 		do {
 			let extractedUIColors = try await uiImage.extractColors(intColorCount)
+			extractedColors = extractedUIColors.map{ Color($0) }
 		}
 		
 		catch let error as ColorExtractionError {
 			throw error
 		}
+		catch {
+			throw ColorExtractionError.unknown
+		}
 		
-			extractedColors = extractedUIColors.map{Color($0)}
+
 		
 	}
 }
