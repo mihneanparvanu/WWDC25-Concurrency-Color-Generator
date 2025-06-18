@@ -60,7 +60,7 @@ extension ExtractColorsButton {
 	}
 	
 	func blurAnimation (for phase: BlurPhase) -> Animation {
-		let animation: Animation = .easeInOut(duration: 1)
+		let animation: Animation = .easeInOut(duration: 1)
 		switch phase {
 			case .clear:
 				return animation
