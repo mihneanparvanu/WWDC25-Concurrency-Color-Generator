@@ -11,11 +11,11 @@ struct ExtractColorsButton: View {
 	let action: () -> Void
 	let colorsCount: Int
 	let disabled: Bool
-	var isLoading: Bool
+	let isLoading: Bool
 	
 	var body: some View {
 		Button (action: action){
-			Text ("Extract \(colorsCount) \(colorsString)")
+			Text (buttonText)
 				.font(.system(size: 15))
 				.padding()
 				.frame(width: 128, height: 128)
@@ -36,8 +36,10 @@ struct ExtractColorsButton: View {
 }
 
 extension ExtractColorsButton {
-	var colorsString: String {
-		colorsCount == 1 ? "color" : "colors"
+	var buttonText: String {
+		let pluralized = colorsCount == 1 ? "color" : "colors"
+		let extractText = isLoading ? "Extracting" : "Extract"
+		return String (format: "%@ %d %@", extractText, colorsCount, pluralized)
 	}
 }
 
@@ -51,14 +53,14 @@ extension ExtractColorsButton {
 			case .clear:
 				return 0
 			case .light:
-				return 5
+				return 2
 			case .heavy:
-				return 10
+				return 8
 		}
 	}
 	
 	func blurAnimation (for phase: BlurPhase) -> Animation {
-		let animation: Animation = .easeInOut(duration: 0.69)
+		let animation: Animation = .easeInOut(duration: 1)
 		switch phase {
 			case .clear:
 				return animation
