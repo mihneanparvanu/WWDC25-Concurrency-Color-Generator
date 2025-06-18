@@ -13,7 +13,7 @@ import SwiftUI
 
 @MainActor
 @Observable
-final class ContentViewViewModel {
+final class ImageSelectionViewModel {
 	let imageProcessor: ImageProcessor
 	
 	init(imageProcessor: ImageProcessor) {
@@ -37,7 +37,7 @@ final class ContentViewViewModel {
 }
 
 //MARK: Color extraction logic
-extension ContentViewViewModel {
+extension ImageSelectionViewModel {
 	func extractColors (_ colors: Int) async throws {
 		guard let uiImage = selectedUIImage else {
 			throw ColorExtractionError.noImageFound
@@ -69,7 +69,7 @@ extension ContentViewViewModel {
 }
 
 //MARK: Display selected image
-extension ContentViewViewModel {
+extension ImageSelectionViewModel {
 	func provideSelectedImage () async throws -> Image? {
 		guard let selectedImage else {
 			throw ImageSelectionError.notFound
@@ -102,7 +102,7 @@ extension ContentViewViewModel {
 }
 
 //MARK: Save photo to context
-extension ContentViewViewModel {
+extension ImageSelectionViewModel {
 	func savePhotoDataToContext (_ context: ModelContext) throws {
 		guard let selectedUIImage else { return }
 		let imageURL = try imageProcessor.saveImageToFiles(image: selectedUIImage)
@@ -120,7 +120,7 @@ extension ContentViewViewModel {
 }
 
 //MARK: Transform data into display images
-extension ContentViewViewModel {
+extension ImageSelectionViewModel {
 	func prepareImagesForDisplay (_ processedImages: [ProcessedImage]) -> [ProcessedImageDisplay] {
 		guard processedImages.isNotEmpty else { return [] }
 		print ("Processed images is not empty")
