@@ -9,28 +9,28 @@ import PhotosUI
 import SwiftUI
 
 struct ImagePickerView: View {
-	@State var vm: ImageSelectionViewModel
-	@State private var photo: Image?
-	let mode: ImageSelectionViewMode
+	@Binding var vm: ImagePickerViewModel
+	@State var photo: Image?
+	let mode: ImagePickerMode
 	let currentImage: Image?
 	
 	///Select mode
 	init(
-		vm: ImageSelectionViewModel,
+		vm: Binding<ImagePickerViewModel>
 	) {
 		self.mode = .select
 		self.currentImage = nil
-		self._vm = State(initialValue: vm)
+		self._vm = vm
 	}
 	
 	///Edit mode
-	init (vm: ImageSelectionViewModel, currentImage: Image){
+	init(vm: Binding<ImagePickerViewModel>, currentImage: Image){
 		self.mode = .edit
-		self._vm = State(initialValue: vm)
 		self.currentImage = currentImage
+		self._vm = vm
 	}
 	
-	
+
 	var body: some View {
 		switch mode {
 			case .select:
@@ -96,8 +96,10 @@ extension ImagePickerView {
 			do {
 				photo = try await  vm.provideSelectedImage()
 			}
-#warning("TODO: Error handling")
-			photo = nil
+			catch {
+				photo = nil
+			}
+	
 		}
 	}
 }
@@ -115,14 +117,15 @@ extension ImagePickerView {
 }
 
 
-enum ImageSelectionViewMode {
+enum ImagePickerMode {
 	case select, edit
 }
 
 #Preview {
-	let vm = ImageSelectionViewModel(imageProcessor: ImageProcessingSevice())
+	@Previewable @State var vm = ImagePickerViewModel(imageProcessor: ImageProcessingSevice())
 	
-	ImagePickerView(vm: vm)
+	ImagePickerView(vm: $vm)
 	
-	ImagePickerView(vm: vm, currentImage: ProcessedImageDisplay.preview.image)
+	ImagePickerView(vm: $vm, currentImage: ProcessedImageDisplay.preview.image)
 }
+

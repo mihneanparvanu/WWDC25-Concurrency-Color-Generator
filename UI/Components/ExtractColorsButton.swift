@@ -10,18 +10,17 @@ import SwiftUI
 struct ExtractColorsButton: View {
 	let action: () -> Void
 	let colorsCount: Int
-	let disabled: Bool
 	let isLoading: Bool
 	
 	var body: some View {
-		Button (action: action){
+		Button (action: action
+		){
 			Text (buttonText)
 				.font(.system(size: 15))
 				.padding()
 				.frame(width: 128, height: 128)
 		}
 		.buttonStyle(.glass)
-		.disabled(disabled)
 		.phaseAnimator(BlurPhase.allCases,
 					   trigger: isLoading,
 					   content: {content, phase in
@@ -70,8 +69,6 @@ extension ExtractColorsButton {
 				return animation
 		}
 	}
-	
-	
 }
 
 
@@ -80,7 +77,6 @@ extension ExtractColorsButton {
 		action: {
 		},
 		colorsCount: 5,
-		disabled: false,
 		isLoading: false)
 }
 

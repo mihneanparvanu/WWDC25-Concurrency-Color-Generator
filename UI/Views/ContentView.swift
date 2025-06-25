@@ -13,13 +13,12 @@ import SwiftUI
 struct ContentView: View {
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
-	@State private var vm: ContentViewViewModel
-	@State private var photo: Image?
+	@State private var pickerVM: ImagePickerViewModel
 	
 	init () {
 		let imageProcessor = ImageProcessingSevice()
-		self._vm = .init(
-			initialValue: ContentViewViewModel(imageProcessor: imageProcessor)
+		self._pickerVM = .init(
+			initialValue: ImagePickerViewModel(imageProcessor: imageProcessor)
 		)
 	}
 	
@@ -27,89 +26,45 @@ struct ContentView: View {
 		
 		NavigationStack {
 			ScrollView {
-			toolbar
-			
-			selectedPhoto
-			
-			extractColors()
-							
-			storedImages
+				ImagePickerView(vm: $pickerVM)
+				
+				extractColors()
+				
+				storedImages
 			}
 		}
 	}
 }
 
-//MARK: Top toolbar
-extension ContentView {
-	@ViewBuilder var toolbar: some View {
-		HStack {
-			Spacer ()
-			PhotosPicker(selection: $vm.selectedImage, matching: .images) {
-				Image(systemName: "camera")
-					.padding()
-			}
-			.buttonStyle(.glass)
-		}
-		.padding()
-		.frame(height: 64)
-	}
-}
-
-//MARK: Selected photo
-extension ContentView {
-	var selectedPhoto: some View {
-		Group {
-			if let photo {
-					photo
-						.resizable()
-						.scaledToFit()
-						.padding(.horizontal)
-			} else {
-				ContentUnavailableView {
-					Label("No image selected", systemImage: "photo.trianglebadge.exclamationmark")
-				} description: {
-					Text ("Tap the photo icon to select a photo.")
-				}
-			}
-		}
-		.frame(maxHeight: .infinity)
-		.onChange(of: vm.selectedImage) {
-			awaitDisplayingImage()
-		}
-	}
-	
-	func awaitDisplayingImage () {
-		Task {
-			try await photo = vm.provideSelectedImage()
-		}
-	}
-}
 
 //MARK: Extract colors
 extension ContentView {
 	@ViewBuilder func extractColors () -> some View {
-		 VStack {
+		VStack {
 			ZStack {
-					if vm.extractedColors.isNotEmpty {
-						ColorWheelView(colors: vm.extractedColors)
-					}
-
+				if pickerVM.extractedColors.isNotEmpty {
+					ColorWheelView(colors: pickerVM.extractedColors)
+				}
+				
 				ExtractColorsButton(
 					action: {
 						Task {
-							try? await vm.extractColors(vm.intColorCount)
-							try? vm.savePhotoDataToContext(context)
+							
+							try? await pickerVM
+								.extractColors(pickerVM.intColorCount)
+							try? pickerVM
+								.savePhotoDataToContext(context)
+							
 						}
 					},
 					colorsCount: colorsCount,
-					disabled: photo == nil,
-					isLoading: vm.isColorExtractionInProgress
+					isLoading: pickerVM.isColorExtractionInProgress
 				)
 			}
 			.frame(width: 256, height: 256)
 			
 			Slider(
-				value: $vm.colorCount,
+				value: $pickerVM.colorCount,
 				in: 1...5,
 				step: 1,
 				onEditingChanged: {editing in
@@ -117,11 +72,11 @@ extension ContentView {
 			)
 		}
 		.padding()
-		}
+	}
 	
 	var colorsCount: Int {
-		vm.intColorCount
-	}	
+		pickerVM.intColorCount
+	}
 }
 
 //MARK: List of stored images
@@ -131,7 +86,7 @@ extension ContentView {
 			ForEach (images) { image in
 				NavigationLink (
 					destination: ProcessedImageDetailView(
-						image: image
+						image: image, pickerVM: $pickerVM
 					)
 				){
 					ImageCard(
