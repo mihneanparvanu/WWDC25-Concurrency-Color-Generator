@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct DeleteCurrentImage: View {
+	@Environment(\.modelContext) var context
+	@Environment(\.dismiss) var dismiss
+	let image: ProcessedImage
     var body: some View {
 		VStack (spacing: 20){
 			Image(systemName: "trash.fill")
@@ -28,18 +31,25 @@ struct DeleteCurrentImage: View {
 extension DeleteCurrentImage {
 	var buttons: some View {
 		VStack (spacing: 24){
-			Button {} label: {
+			Button {
+				context.delete(image)
+				print (context.hasChanges)
+				
+				try? context.save()
+				dismiss()
+			} label: {
 			Text ("Yes, delete")
 					.foregroundStyle(.white)
 					.frame(maxWidth: .infinity)
 					.padding(12)
 					.background(.red.opacity(0.9))
 					.clipShape(Capsule())
-			
 			}
 	
 			
-			Button {} label : {
+			Button {
+				dismiss()
+			} label : {
 			Text ("Cancel")
 					.padding(12)
 					.frame(maxWidth: .infinity)
@@ -52,5 +62,6 @@ extension DeleteCurrentImage {
 }
 
 #Preview {
-    DeleteCurrentImage()
+	let displayImage = ProcessedImageDisplay.preview
+	DeleteCurrentImage(image: displayImage.processedImage)
 }

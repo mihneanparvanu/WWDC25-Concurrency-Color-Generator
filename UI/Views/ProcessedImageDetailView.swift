@@ -43,11 +43,6 @@ extension ProcessedImageDetailView {
 			Button {
 				sheetContent = .delete
 				shouldPresentSheet.toggle()
-				context.delete(image)
-				print (context.hasChanges)
-				
-				try? context.save()
-				dismiss()
 			} label: {
 				buttonLabel()
 			}
@@ -88,7 +83,7 @@ extension ProcessedImageDetailView {
 			case .edit:
 				ImagePickerView(vm: $pickerVM, currentImage: displayImage.image)
 			case .delete:
-				DeleteCurrentImage()
+				DeleteCurrentImage(image: image)
 		}
 	}
 }
