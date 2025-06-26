@@ -11,12 +11,15 @@ import SwiftUI
 
 
 struct ContentView: View {
+	@State private var vm: ContentViewViewModel
+	@State private var pickerVM: ImagePickerViewModel
+	
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
-	@State private var pickerVM: ImagePickerViewModel
 	
 	init () {
 		let imageProcessor = ImageProcessingSevice()
+		self.vm = .init(proccessor: imageProcessor)
 		self._pickerVM = .init(
 			initialValue: ImagePickerViewModel(imageProcessor: imageProcessor)
 		)
@@ -35,35 +38,30 @@ struct ContentView: View {
 	}
 }
 
-
 //MARK: Extract colors
 extension ContentView {
 	@ViewBuilder func extractColors () -> some View {
 		VStack {
 			ZStack {
-				if pickerVM.extractedColors.isNotEmpty {
-					ColorWheelView(colors: pickerVM.extractedColors)
+				if let extractedColors = vm.extractedColors {
+					ColorWheelView(colors: extractedColors)
 				}
 				
 				ExtractColorsButton(
 					action: {
 						Task {
-							
-							try? await pickerVM
-								.extractColors(pickerVM.intColorCount)
-							try? pickerVM
-								.savePhotoDataToContext(context)
-							
+							try? await vm.extractColors(from: selectedImage)
+							try? vm.saveImageInContext(selectedImage, in: context)
 						}
 					},
 					colorsCount: colorsCount,
-					isLoading: pickerVM.isColorExtractionInProgress
+					isLoading: vm.isColorExtractionInProgress
 				)
 			}
 			.frame(width: 256, height: 256)
 			
 			Slider(
-				value: $pickerVM.colorCount,
+				value: $vm.colorCount,
 				in: 1...5,
 				step: 1,
 				onEditingChanged: {editing in
@@ -73,8 +71,12 @@ extension ContentView {
 		.padding()
 	}
 	
+	var selectedImage: UIImage? {
+		pickerVM.selectedUIImage
+	}
+	
 	var colorsCount: Int {
-		pickerVM.intColorCount
+		vm.intColorCount
 	}
 }
 

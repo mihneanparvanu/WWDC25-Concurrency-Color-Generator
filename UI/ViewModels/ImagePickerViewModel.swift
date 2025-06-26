@@ -22,7 +22,6 @@ final class ImagePickerViewModel {
 	
 	var selectedItem: PhotosPickerItem? {
 		didSet {
-			extractedColors = []
 			Task {
 				do {
 					try await provideSelectedImage()
@@ -39,43 +38,6 @@ final class ImagePickerViewModel {
 			return	Image(uiImage: uiImage)
 		}
 		return nil
-	}
-	
-	var colorCount: Double = 5
-	var intColorCount: Int {
-		Int(colorCount)
-	}
-	var extractedColors: [Color] = []
-	
-	var isColorExtractionInProgress: Bool = false
-}
-
-//MARK: Color extraction logic
-extension ImagePickerViewModel {
-	func extractColors (_ colors: Int) async throws {
-		guard let uiImage = selectedUIImage else {
-			throw ColorExtractionError.noImageFound
-		}
-		
-		isColorExtractionInProgress = true
-		defer {
-			isColorExtractionInProgress = false
-		}
-		
-		//Clear previous colors
-		extractedColors = []
-		
-		do {
-			let extractedUIColors = try await uiImage.extractColors(intColorCount)
-			extractedColors = extractedUIColors.map{ Color($0) }
-		}
-		
-		catch let error as ColorExtractionError {
-			throw error
-		}
-		catch {
-			throw ColorExtractionError.unknown
-		}
 	}
 }
 
@@ -107,35 +69,6 @@ extension ImagePickerViewModel {
 		
 		catch {
 			throw ImageSelectionError.unknown
-		}
-	}
-}
-
-//MARK: Save photo to context
-extension ImagePickerViewModel {
-	func savePhotoDataToContext (_ context: ModelContext) throws {
-		guard let selectedUIImage else { return }
-		let imageURL = try imageProcessor.saveImageToFiles(image: selectedUIImage)
-		var imageColorHexCodes: [String] = []
-		extractedColors.forEach({color in
-			if let hexString = color.toHex {
-				imageColorHexCodes.append(hexString)
-			}
-		})
-		
-		let processedImage = ProcessedImage(imageURL: imageURL, colorHexCodes: imageColorHexCodes)
-		context.insert(processedImage)
-		try context.save()
-	}
-}
-
-//MARK: Transform data into display images
-extension ImagePickerViewModel {
-	func prepareImagesForDisplay (_ processedImages: [ProcessedImage]) -> [ProcessedImageDisplay] {
-		guard processedImages.isNotEmpty else { return [] }
-		
-		return processedImages.compactMap { processedImage in
-			ProcessedImageDisplay(processedImage: processedImage)
 		}
 	}
 }
