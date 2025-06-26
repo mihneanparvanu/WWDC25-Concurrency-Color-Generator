@@ -12,11 +12,10 @@ struct ProcessedImageDetailView: View {
 	@Binding var pickerVM: ImagePickerViewModel
 	@Environment(\.modelContext) var context
 	@Environment(\.dismiss) var dismiss
-
-	@State private var shouldPresentSheet: Bool = false
-	@State private var sheetContent: SheetContent = .delete
-
-
+	
+	@State private var sheetContent: SheetContent?
+	
+	
 	var body: some View {
 		VStack (spacing: 32){
 			ImageCard(displayImage: displayImage,
@@ -24,8 +23,9 @@ struct ProcessedImageDetailView: View {
 			
 			buttons
 		}
-		.sheet(isPresented: $shouldPresentSheet){
-			sheetContentView
+		.sheet(item: $sheetContent){content in
+			sheetView(content: content)
+				.presentationDetents(sheetDetents(for: content))
 		}
 	}
 }
@@ -36,13 +36,11 @@ extension ProcessedImageDetailView {
 		HStack (spacing: 16){
 			Button {
 				sheetContent = .edit
-				shouldPresentSheet.toggle()
 			} label: {
 				buttonLabel(systemName: "pencil", color: .gray)
 			}
 			Button {
 				sheetContent = .delete
-				shouldPresentSheet.toggle()
 			} label: {
 				buttonLabel()
 			}
@@ -59,12 +57,45 @@ extension ProcessedImageDetailView {
 	
 }
 
-//MARK: Useful
+//MARK: Display image
 extension ProcessedImageDetailView {
 	var displayImage: ProcessedImageDisplay {
 		ProcessedImageDisplay(processedImage: image)
 	}
 }
+
+
+//MARK: Sheet Logic
+extension ProcessedImageDetailView {
+	@ViewBuilder func sheetView(content: SheetContent) -> some View {
+		switch content {
+			case .edit:
+				ImagePickerView(vm: $pickerVM, currentImage: displayImage.image)
+			case .delete:
+				DeleteCurrentImage(image: image, dismissNav: {dismiss()})
+		}
+	}
+	
+	func sheetDetents (for content: SheetContent) -> Set<PresentationDetent> {
+		let fraction: PresentationDetent = .fraction(0.3)
+		
+		switch content {
+			case .edit:
+				return [fraction, .medium]
+			case .delete:
+				return [fraction]
+		}
+	}
+	
+}
+enum SheetContent: String, Identifiable {
+	case edit, delete
+	
+	var id: String {
+		self.rawValue
+	}
+}
+
 
 #Preview {
 	@Previewable @State var pickerVM = ImagePickerViewModel(imageProcessor: ImageProcessingSevice())
@@ -72,23 +103,5 @@ extension ProcessedImageDetailView {
 	
 	ProcessedImageDetailView(image: image,
 							 pickerVM: $pickerVM)
-		
-}
-
-
-//MARK: Sheet Logic
-extension ProcessedImageDetailView {
-	@ViewBuilder var sheetContentView: some View {
-		switch sheetContent {
-			case .edit:
-				ImagePickerView(vm: $pickerVM, currentImage: displayImage.image)
-			case .delete:
-				DeleteCurrentImage(image: image, dismissNav: {dismiss()})
-		}
-	}
-}
-
-
-enum SheetContent {
-	case edit, delete
+	
 }

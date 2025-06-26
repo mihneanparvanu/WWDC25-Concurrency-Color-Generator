@@ -9,6 +9,7 @@ import PhotosUI
 import SwiftUI
 
 struct ImagePickerView: View {
+	@Environment(\.uiConstants) var ui
 	@Binding var vm: ImagePickerViewModel
 	@State var photo: Image?
 	let mode: ImagePickerMode
@@ -108,7 +109,13 @@ extension ImagePickerView {
 extension ImagePickerView {
 	var editView: some View {
 		VStack {
-			currentImage
+			currentImage?
+				.resizable()
+				.scaledToFit()
+				.frame(width: 100, height: 100)
+				.clipShape(.rect(cornerRadius: ui.spacing.minCornerRadius))
+			
+			
 			
 			PhotosPicker(selection: $vm.selectedImage, label: {
 				Label("Change image", systemImage: "photo")

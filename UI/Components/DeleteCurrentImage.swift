@@ -33,9 +33,7 @@ extension DeleteCurrentImage {
 	var buttons: some View {
 		VStack (spacing: 24){
 			Button {
-				context.delete(image)
-				print (context.hasChanges)
-				
+				context.delete(image)				
 				try? context.save()
 				dismiss()
 				dismissNav()
