@@ -20,12 +20,26 @@ final class ImagePickerViewModel {
 		self.imageProcessor = imageProcessor
 	}
 	
-	var selectedImage: PhotosPickerItem? {
+	var selectedItem: PhotosPickerItem? {
 		didSet {
 			extractedColors = []
+			Task {
+				do {
+					try await provideSelectedImage()
+				}
+				catch {
+					selectedUIImage = nil
+				}
+			}
 		}
 	}
 	var selectedUIImage: UIImage?
+	var selectedImage: Image? {
+		if let uiImage = selectedUIImage {
+			return	Image(uiImage: uiImage)
+		}
+		return nil
+	}
 	
 	var colorCount: Double = 5
 	var intColorCount: Int {
@@ -67,12 +81,12 @@ extension ImagePickerViewModel {
 
 //MARK: Display selected image
 extension ImagePickerViewModel {
-	func provideSelectedImage () async throws -> Image? {
-		guard let selectedImage else {
+	func provideSelectedImage () async throws {
+		guard let selectedItem else {
 			throw ImageSelectionError.notFound
 		}
 		do {
-			guard let data = try await imageProcessor.extractData(from: selectedImage) else {
+			guard let data = try await imageProcessor.extractData(from: selectedItem) else {
 				throw ImageSelectionError.timeout
 			}
 			
@@ -85,7 +99,6 @@ extension ImagePickerViewModel {
 			}
 			
 			selectedUIImage = uiImage
-			return Image (uiImage: uiImage)
 			
 		}
 		catch let error as ImageSelectionError {

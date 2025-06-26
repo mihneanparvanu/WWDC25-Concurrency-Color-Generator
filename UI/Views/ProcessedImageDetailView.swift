@@ -25,7 +25,7 @@ struct ProcessedImageDetailView: View {
 		}
 		.sheet(item: $sheetContent){content in
 			sheetView(content: content)
-				.presentationDetents(sheetDetents(for: content))
+				.presentationDetents(content.detents)
 		}
 	}
 }
@@ -70,29 +70,32 @@ extension ProcessedImageDetailView {
 	@ViewBuilder func sheetView(content: SheetContent) -> some View {
 		switch content {
 			case .edit:
-				ImagePickerView(vm: $pickerVM, currentImage: displayImage.image)
+				ImagePickerView(
+					vm: $pickerVM,
+					mode: .edit(currentImage: displayImage.image)
+				)
 			case .delete:
 				DeleteCurrentImage(image: image, dismissNav: {dismiss()})
 		}
 	}
-	
-	func sheetDetents (for content: SheetContent) -> Set<PresentationDetent> {
-		let fraction: PresentationDetent = .fraction(0.3)
-		
-		switch content {
-			case .edit:
-				return [fraction, .medium]
-			case .delete:
-				return [fraction]
-		}
-	}
-	
 }
+
+
 enum SheetContent: String, Identifiable {
 	case edit, delete
 	
 	var id: String {
 		self.rawValue
+	}
+	
+	var detents: Set<PresentationDetent> {
+		let fraction: PresentationDetent = .fraction(0.3)
+		switch self {
+			case .edit:
+				return [fraction, .medium]
+			case .delete:
+				return [fraction]
+		}
 	}
 }
 

@@ -9,56 +9,50 @@ import PhotosUI
 import SwiftUI
 
 struct ImagePickerView: View {
-	@Environment(\.uiConstants) var ui
 	@Binding var vm: ImagePickerViewModel
-	@State var photo: Image?
 	let mode: ImagePickerMode
-	let currentImage: Image?
 	
-	///Select mode
-	init(
-		vm: Binding<ImagePickerViewModel>
-	) {
-		self.mode = .select
-		self.currentImage = nil
-		self._vm = vm
-	}
+	@Environment(\.uiConstants) var ui
 	
-	///Edit mode
-	init(vm: Binding<ImagePickerViewModel>, currentImage: Image){
-		self.mode = .edit
-		self.currentImage = currentImage
-		self._vm = vm
-	}
-	
-
 	var body: some View {
 		switch mode {
 			case .select:
-				selectView
-			case .edit:
-				editView
+				SelectView(
+					selectedItem: $vm.selectedItem,
+					image: vm.selectedImage
+				)
+			case .edit(let currentImage):
+				EditView(
+					currentImage: currentImage,
+					selectedItem: $vm.selectedItem,
+					selectedImage: vm.selectedImage
+				)
 		}
 	}
 }
 
-//MARK: selectView
-extension ImagePickerView {
-	var selectView: some View {
-		VStack {
-			toolbar
-			
-			selectedPhoto
+//MARK: SelectView
+private extension ImagePickerView {
+	struct SelectView: View {
+		@Binding var selectedItem: PhotosPickerItem?
+		let image: Image?
+		var body: some View {
+			VStack {
+				toolbar
+				
+				selectedPhoto
+			}
 		}
 	}
 }
+
 
 //Top toolbar
-extension ImagePickerView {
+extension ImagePickerView.SelectView {
 	@ViewBuilder var toolbar: some View {
 		HStack {
 			Spacer ()
-			PhotosPicker(selection: $vm.selectedImage, matching: .images) {
+			PhotosPicker(selection: $selectedItem, matching: .images) {
 				Image(systemName: "camera")
 					.padding()
 			}
@@ -70,11 +64,11 @@ extension ImagePickerView {
 }
 
 //Selected photo
-extension ImagePickerView {
+extension ImagePickerView.SelectView {
 	var selectedPhoto: some View {
 		Group {
-			if let photo {
-				photo
+			if let image {
+				image
 					.resizable()
 					.scaledToFit()
 					.padding(.horizontal)
@@ -87,52 +81,63 @@ extension ImagePickerView {
 			}
 		}
 		.frame(maxHeight: .infinity)
-		.onChange(of: vm.selectedImage) {
-			loadSelectedImage()
-		}
 	}
-	
-	func loadSelectedImage () {
-		Task {
-			do {
-				photo = try await  vm.provideSelectedImage()
+}
+
+
+//EditView
+private extension ImagePickerView {
+	struct EditView: View {
+		let currentImage: Image?
+		@Binding var selectedItem: PhotosPickerItem?
+		let selectedImage: Image?
+		
+		@Environment(\.uiConstants) var ui
+		
+		var body: some View {
+				editImage
+					.resizable()
+					.scaledToFit()
+					.frame(width: 100, height: 100)
+					.clipShape(.rect(cornerRadius: ui.spacing.minCornerRadius))
+				
+			PhotosPicker(selection: $selectedItem, label: {
+					Label("Change image", systemImage: "photo")
+				})
 			}
-			catch {
-				photo = nil
-			}
-	
+		}
+}
+
+extension ImagePickerView.EditView {
+	var editImage: Image {
+		if let image = selectedImage {
+			return image
+		} else {
+			return currentImage ?? Image(systemName: "phototrianglebadge.exclamationmark")
 		}
 	}
 }
 
-//MARK: editView
-extension ImagePickerView {
-	var editView: some View {
-		VStack {
-			currentImage?
-				.resizable()
-				.scaledToFit()
-				.frame(width: 100, height: 100)
-				.clipShape(.rect(cornerRadius: ui.spacing.minCornerRadius))
-			
-			
-			
-			PhotosPicker(selection: $vm.selectedImage, label: {
-				Label("Change image", systemImage: "photo")
-			})	}
-	}
-}
 
 
 enum ImagePickerMode {
-	case select, edit
+	case select, edit(currentImage: Image)
 }
+
 
 #Preview {
 	@Previewable @State var vm = ImagePickerViewModel(imageProcessor: ImageProcessingSevice())
 	
-	ImagePickerView(vm: $vm)
+	ImagePickerView(vm: $vm, mode: .select)
 	
-	ImagePickerView(vm: $vm, currentImage: ProcessedImageDisplay.preview.image)
 }
 
+#Preview {
+	@Previewable @State var vm = ImagePickerViewModel(imageProcessor: ImageProcessingSevice())
+	let image = ProcessedImageDisplay.preview.image
+	
+	ImagePickerView(
+		vm: $vm,
+		mode: .edit(currentImage: image)
+	)
+}

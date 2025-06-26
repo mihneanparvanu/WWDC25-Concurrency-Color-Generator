@@ -23,10 +23,9 @@ struct ContentView: View {
 	}
 	
 	var body: some View {
-		
 		NavigationStack {
 			ScrollView {
-				ImagePickerView(vm: $pickerVM)
+				ImagePickerView(vm: $pickerVM, mode: .select)
 				
 				extractColors()
 				
