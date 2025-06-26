@@ -34,14 +34,11 @@ struct ImageProcessingSevice: ImageProcessor {
 			for: .documentDirectory,
 			in: .userDomainMask
 		)[0]
-		print("Saving to directory: \(directory.path)")
 		let filename = UUID().uuidString
 		let fileURL = directory.appendingPathComponent(filename)
 		try data.write(to: fileURL)
 		if fileManager.fileExists(atPath: fileURL.path) {
-			print("Image saved successfully at \(fileURL.path)")
 		} else {
-			print("Failed to save image.")
 		}
 		return fileURL
 	}

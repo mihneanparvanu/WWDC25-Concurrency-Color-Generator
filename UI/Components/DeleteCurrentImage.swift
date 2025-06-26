@@ -11,6 +11,7 @@ struct DeleteCurrentImage: View {
 	@Environment(\.modelContext) var context
 	@Environment(\.dismiss) var dismiss
 	let image: ProcessedImage
+	let dismissNav: () -> Void
     var body: some View {
 		VStack (spacing: 20){
 			Image(systemName: "trash.fill")
@@ -37,6 +38,7 @@ extension DeleteCurrentImage {
 				
 				try? context.save()
 				dismiss()
+				dismissNav()
 			} label: {
 			Text ("Yes, delete")
 					.foregroundStyle(.white)
@@ -63,5 +65,5 @@ extension DeleteCurrentImage {
 
 #Preview {
 	let displayImage = ProcessedImageDisplay.preview
-	DeleteCurrentImage(image: displayImage.processedImage)
+	DeleteCurrentImage(image: displayImage.processedImage, dismissNav: {})
 }

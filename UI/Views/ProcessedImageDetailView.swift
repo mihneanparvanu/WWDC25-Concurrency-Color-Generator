@@ -83,7 +83,7 @@ extension ProcessedImageDetailView {
 			case .edit:
 				ImagePickerView(vm: $pickerVM, currentImage: displayImage.image)
 			case .delete:
-				DeleteCurrentImage(image: image)
+				DeleteCurrentImage(image: image, dismissNav: {dismiss()})
 		}
 	}
 }
