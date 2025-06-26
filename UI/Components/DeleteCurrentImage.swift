@@ -24,7 +24,8 @@ struct DeleteCurrentImage: View {
 			
 			buttons
 		}
-		.padding(44)
+		.padding(.horizontal, 44)
+		.padding(.vertical)
 		
     }
 }
@@ -33,7 +34,7 @@ extension DeleteCurrentImage {
 	var buttons: some View {
 		VStack (spacing: 24){
 			Button {
-				context.delete(image)				
+				context.delete(image)
 				try? context.save()
 				dismiss()
 				dismissNav()

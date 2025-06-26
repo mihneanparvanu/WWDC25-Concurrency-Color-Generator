@@ -15,7 +15,6 @@ struct ProcessedImageDetailView: View {
 	
 	@State private var sheetContent: SheetContent?
 	
-	
 	var body: some View {
 		VStack (spacing: 32){
 			ImageCard(displayImage: displayImage,
@@ -35,11 +34,6 @@ extension ProcessedImageDetailView {
 	var buttons: some View {
 		HStack (spacing: 16){
 			Button {
-				sheetContent = .edit
-			} label: {
-				buttonLabel(systemName: "pencil", color: .gray)
-			}
-			Button {
 				sheetContent = .delete
 			} label: {
 				buttonLabel()
@@ -53,6 +47,7 @@ extension ProcessedImageDetailView {
 		Image(systemName: systemName)
 			.padding()
 			.frame(width: 44, height: 44)
+			.foregroundStyle(color)
 	}
 	
 }
@@ -89,7 +84,7 @@ enum SheetContent: String, Identifiable {
 	}
 	
 	var detents: Set<PresentationDetent> {
-		let fraction: PresentationDetent = .fraction(0.3)
+		let fraction: PresentationDetent = .fraction(0.4)
 		switch self {
 			case .edit:
 				return [fraction, .medium]

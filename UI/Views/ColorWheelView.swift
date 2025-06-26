@@ -38,6 +38,11 @@ struct ColorWheelView: View {
 						   value: shouldAnimate)
 				.onAppear() {
 					shouldAnimate = true
+					print ("Appeared")
+				}
+				.onDisappear() {
+					shouldAnimate = false
+					print ("Disappeared")
 				}
 			}
 		}
