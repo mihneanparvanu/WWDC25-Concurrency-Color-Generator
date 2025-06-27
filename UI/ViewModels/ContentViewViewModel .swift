@@ -14,9 +14,11 @@ import SwiftUI
 @Observable
 final class ContentViewViewModel {
 	let imageProcessor: ImageProcessor
+	let colorExtractor: ColorExtractor
 	
-	init(proccessor: ImageProcessor){
+	init(proccessor: ImageProcessor, colorExtractor: ColorExtractor){
 		self.imageProcessor = proccessor
+		self.colorExtractor = colorExtractor
 	}
 	
 	var colorCount: Double = 5
@@ -32,29 +34,10 @@ final class ContentViewViewModel {
 
 //MARK: Color extraction logic
 extension ContentViewViewModel {
-	func extractColors (from selectedImage: UIImage?) async throws {
-		guard let uiImage = selectedImage else { throw ColorExtractionError.noImageFound }
-		extractedColors = []
+	func extractColors (from selectedUIImage: UIImage?) async throws {
+		guard let uiImage = selectedUIImage else { return }
 		
-		isColorExtractionInProgress = true
-		defer {
-			isColorExtractionInProgress = false
-		}
-		
-		//Clear previous colors
-		extractedColors = []
-		
-		do {
-			let extractedUIColors = try await uiImage.extractColors(intColorCount)
-			extractedColors = extractedUIColors.map{ Color($0) }
-		}
-		
-		catch let error as ColorExtractionError {
-			throw error
-		}
-		catch {
-			throw ColorExtractionError.unknown
-		}
+		extractedColors = try await colorExtractor.extractColors(count: intColorCount, from: uiImage)
 	}
 }
 

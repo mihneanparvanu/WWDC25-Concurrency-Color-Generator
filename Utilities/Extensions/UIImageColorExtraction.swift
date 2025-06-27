@@ -113,27 +113,3 @@ extension UIColor {
 		return distance < tolerance
 	}
 }
-
-
-enum ColorExtractionError: Error {
-	case noImageFound, coreImageCreationFailed, kmeansFilterFailed, paletteGenerationFailed, cgImageConversionFailed, contextRenderingFailed, unknown
-	
-	var localizedDescription: String  {
-		switch self {
-			case .noImageFound:
-				return "No image found."
-				case .coreImageCreationFailed:
-				return "Failed to create CoreImage context."
-			case .kmeansFilterFailed:
-				return "Failed to apply K-Means clustering filter."
-			case .paletteGenerationFailed:
-				return "Failed to generate color palette."
-			case .cgImageConversionFailed:
-				return "Failed to convert CGImage."
-			case .contextRenderingFailed:
-				return "Failed to render context."
-			case .unknown:
-				return "Unknown error."
-		}
-	}
-}

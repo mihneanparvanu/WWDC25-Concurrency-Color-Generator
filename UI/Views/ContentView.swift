@@ -19,7 +19,11 @@ struct ContentView: View {
 	
 	init () {
 		let imageProcessor = ImageProcessingSevice()
-		self.vm = .init(proccessor: imageProcessor)
+		let colorExtractor = ColorExtractionService()
+		self.vm = .init(
+			proccessor: imageProcessor,
+			colorExtractor: colorExtractor
+		)
 		self._pickerVM = .init(
 			initialValue: ImagePickerViewModel(imageProcessor: imageProcessor)
 		)

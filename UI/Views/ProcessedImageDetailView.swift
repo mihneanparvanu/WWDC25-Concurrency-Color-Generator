@@ -12,6 +12,7 @@ struct ProcessedImageDetailView: View {
 	@Binding var pickerVM: ImagePickerViewModel
 	@Environment(\.modelContext) var context
 	@Environment(\.dismiss) var dismiss
+	let colorExtractor = ColorExtractionService()
 	
 	@State private var sheetContent: SheetContent?
 	
@@ -26,6 +27,7 @@ struct ProcessedImageDetailView: View {
 			sheetView(content: content)
 				.presentationDetents(content.detents)
 		}
+		
 	}
 }
 
@@ -33,6 +35,12 @@ struct ProcessedImageDetailView: View {
 extension ProcessedImageDetailView {
 	var buttons: some View {
 		HStack (spacing: 16){
+			Button {
+				sheetContent = .edit
+			} label : {
+				buttonLabel(systemName: "pencil", color: .blue)
+			}
+			
 			Button {
 				sheetContent = .delete
 			} label: {
@@ -102,4 +110,11 @@ enum SheetContent: String, Identifiable {
 	ProcessedImageDetailView(image: image,
 							 pickerVM: $pickerVM)
 	
+}
+
+#Preview {
+	@Previewable @State var pickerVM = ImagePickerViewModel(imageProcessor: ImageProcessingSevice())
+	
+	let image = ProcessedImageDisplay.preview.image
+	ImagePickerView(vm: $pickerVM, mode: .edit(currentImage: image))
 }
