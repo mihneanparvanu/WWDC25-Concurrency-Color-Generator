@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProcessedImageDetailView: View {
-	var image: ProcessedImage
+	@Bindable var image: ProcessedImage
 	@Binding var pickerVM: ImagePickerViewModel
 	@Environment(\.modelContext) var context
 	@Environment(\.dismiss) var dismiss
@@ -27,7 +27,6 @@ struct ProcessedImageDetailView: View {
 			sheetView(content: content)
 				.presentationDetents(content.detents)
 		}
-		
 	}
 }
 
