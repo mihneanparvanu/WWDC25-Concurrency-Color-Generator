@@ -29,9 +29,7 @@ struct ProcessedImageDetailView: View {
 		}
 		.onChange(of: pickerVM.selectedImage, {
 			Task {
-				let processedImage = try await ProcessedImage.create(image: pickerVM.selectedUIImage, colorCount: 5)
-				image.imageURL = processedImage.imageURL
-				image.colorHexCodes = processedImage.colorHexCodes
+				try await image.update(with: pickerVM.selectedUIImage)
 			}
 			
 		})

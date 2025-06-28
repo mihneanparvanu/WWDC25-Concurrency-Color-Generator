@@ -59,9 +59,10 @@ extension ContentView {
 						Task {
 							isColorExtractionInProgress = true
 							let processedImage = try await
-							ProcessedImage.create(
-									image: pickerVM.selectedUIImage,
-									colorCount: colorsCount
+							ProcessedImage
+								.create(
+									from: pickerVM.selectedUIImage,
+									extractingColors: colorsCount
 								)
 							isColorExtractionInProgress = false
 							extractedColors = ProcessedImageDisplay(

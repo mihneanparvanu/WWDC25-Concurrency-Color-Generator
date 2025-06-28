@@ -20,25 +20,26 @@ class ProcessedImage {
 }
 
 extension ProcessedImage {
-	static var imageProcessor: ImageProcessor = ImageProcessingSevice()
-	static var colorExtractor: ColorExtractor = ColorExtractionService()
+	private static var imageProcessor: ImageProcessor = ImageProcessingSevice()
+	private static var colorExtractor: ColorExtractor = ColorExtractionService()
 	
-	static func create(image uiImage: UIImage?, colorCount: Int, using imageProcessor: ImageProcessor? = nil, using colorExtractor: ColorExtractor? = nil) async throws -> ProcessedImage {
-		let extractor = colorExtractor ?? Self.colorExtractor
+	static func create(from uiImage: UIImage?,
+					   extractingColors colorCount: Int,
+					   imageProcessor: ImageProcessor? = nil,
+					   colorExtractor: ColorExtractor? = nil
+	) async throws -> ProcessedImage {
 		let processor = imageProcessor ?? Self.imageProcessor
+		let extractor = colorExtractor ?? Self.colorExtractor
 		
-		guard let uiImage = uiImage else {
-			throw ColorExtractionError
-			.noImageFound}
+		guard let uiImage = uiImage else { throw ColorExtractionError .noImageFound }
 		
-		
-		//Extract colors
+		//Try extracting colors
 		let colors = try await extractor.extractColors(
 			count: colorCount,
 			from: uiImage
 		)
 		
-		//Save image to disk
+		//Try saving image to files
 		let imageURL = try processor.saveImageToFiles(image: uiImage)
 		
 		
@@ -48,5 +49,28 @@ extension ProcessedImage {
 			colorHexCodes: colors.map{$0.toHex ?? ""})
 	}
 	
+	func update(with uiImage: UIImage?,
+				colorCount: Int = 5,
+				imageProcessor: ImageProcessor? = nil,
+				colorExtractor: ColorExtractor? = nil
+	) async throws {
+		let processor = imageProcessor ?? Self.imageProcessor
+		let extractor = colorExtractor ?? Self.colorExtractor
+		
+		guard let uiImage else { throw ColorExtractionError.noImageFound }
+		
+		//Try extracting colors
+		let newColors = try await extractor.extractColors(
+			count: colorCount,
+			from: uiImage
+		)
+		
+		//Try saving image to files
+		let newImageURL = try processor.saveImageToFiles(image: uiImage)
+		
+		//Update processed image
+		self.imageURL = newImageURL
+		self.colorHexCodes = newColors.map ({$0.toHex ?? ""})
+	}
 }
 
