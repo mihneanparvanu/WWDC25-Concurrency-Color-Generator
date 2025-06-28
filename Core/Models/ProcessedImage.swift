@@ -50,7 +50,7 @@ extension ProcessedImage {
 	}
 	
 	func update(with uiImage: UIImage?,
-				colorCount: Int = 5,
+				colorCount: Int? = nil,
 				fileService: LocalFilesService? = nil,
 				colorExtractor: ColorExtractor? = nil
 	) async throws {
@@ -60,8 +60,9 @@ extension ProcessedImage {
 		guard let uiImage else { throw ColorExtractionError.noImageFound }
 		
 		//Try extracting colors
+		let colorsToUpdate = colorCount ?? self.colorHexCodes.count
 		let newColors = try await extractor.extractColors(
-			count: colorCount,
+			count: colorsToUpdate,
 			from: uiImage
 		)
 		
