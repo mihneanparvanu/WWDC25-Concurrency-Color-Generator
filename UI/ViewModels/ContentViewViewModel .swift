@@ -43,23 +43,6 @@ extension ContentViewViewModel {
 
 
 //MARK: Save photo to context
-extension ContentViewViewModel {
-	func saveImageInContext (_ selectedUIImage: UIImage?, in context: ModelContext) throws {
-		guard let selectedUIImage else { return }
-		guard let extractedColors else { return }
-		let imageURL = try imageProcessor.saveImageToFiles(image: selectedUIImage)
-		var imageColorHexCodes: [String] = []
-		extractedColors.forEach({color in
-			if let hexString = color.toHex {
-				imageColorHexCodes.append(hexString)
-			}
-		})
-		
-		let processedImage = ProcessedImage(imageURL: imageURL, colorHexCodes: imageColorHexCodes)
-		context.insert(processedImage)
-		try context.save()
-	}
-}
 
 //MARK: Transform data into display images
 extension ContentViewViewModel {

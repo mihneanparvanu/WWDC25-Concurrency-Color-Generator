@@ -54,8 +54,12 @@ extension ContentView {
 				ExtractColorsButton(
 					action: {
 						Task {
-							try? await vm.extractColors(from: selectedImage)
-							try? vm.saveImageInContext(selectedImage, in: context)
+							let processedImage = try await ProcessedImage.create(
+									image: pickerVM.selectedUIImage,
+									colorCount: colorsCount
+								)
+							context.insert(processedImage)
+							try context.save()
 						}
 					},
 					colorsCount: colorsCount,
