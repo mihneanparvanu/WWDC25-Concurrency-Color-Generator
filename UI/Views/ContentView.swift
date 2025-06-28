@@ -17,9 +17,7 @@ struct ContentView: View {
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
 	
-	init (vm: ContentViewViewModel,
-		  pickerVM: ImagePickerViewModel
-	) {
+	init () {
 		let imageProcessor = ImageProcessingSevice()
 		self.vm = ContentViewViewModel()
 		self.pickerVM = ImagePickerViewModel(imageProcessor: imageProcessor)
@@ -43,30 +41,22 @@ extension ContentView {
 	@ViewBuilder func extractColors () -> some View {
 		VStack {
 			ZStack {
-				if let extractedColors = extractedColors {
+				if let extractedColors = vm.extractedColors {
 					ColorWheelView(colors: extractedColors)
 				}
 				
 				ExtractColorsButton(
 					action: {
 						Task {
-							isColorExtractionInProgress = true
-							let processedImage = try await
-							ProcessedImage
-								.create(
-									from: pickerVM.selectedUIImage,
-									extractingColors: colorsCount
+							try await vm
+								.saveCurrentImage(
+									pickerVM.selectedUIImage,
+									in: context
 								)
-							isColorExtractionInProgress = false
-							extractedColors = ProcessedImageDisplay(
-								processedImage: processedImage
-							).colors
-							context.insert(processedImage)
-							try context.save()
 						}
 					},
 					colorsCount: colorsCount,
-					isLoading: isColorExtractionInProgress
+					isLoading: vm.isColorExtractionInProgress
 				)
 			}
 			.frame(width: 256, height: 256)
