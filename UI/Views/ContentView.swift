@@ -14,22 +14,15 @@ struct ContentView: View {
 	@State private var vm: ContentViewViewModel
 	@State private var pickerVM: ImagePickerViewModel
 	
-	@State var isColorExtractionInProgress: Bool = false
-	@State var extractedColors : [Color]?
-	
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
 	
-	init () {
+	init (vm: ContentViewViewModel,
+		  pickerVM: ImagePickerViewModel
+	) {
 		let imageProcessor = ImageProcessingSevice()
-		let colorExtractor = ColorExtractionService()
-		self.vm = .init(
-			proccessor: imageProcessor,
-			colorExtractor: colorExtractor
-		)
-		self._pickerVM = .init(
-			initialValue: ImagePickerViewModel(imageProcessor: imageProcessor)
-		)
+		self.vm = ContentViewViewModel()
+		self.pickerVM = ImagePickerViewModel(imageProcessor: imageProcessor)
 	}
 	
 	var body: some View {

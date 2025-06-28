@@ -13,20 +13,13 @@ import SwiftUI
 @MainActor
 @Observable
 final class ContentViewViewModel {
-	let imageProcessor: ImageProcessor
-	let colorExtractor: ColorExtractor
 	
-	init(proccessor: ImageProcessor, colorExtractor: ColorExtractor){
-		self.imageProcessor = proccessor
-		self.colorExtractor = colorExtractor
-	}
-	
+	//Color extraction
 	var colorCount: Double = 5
 	var intColorCount: Int {
 		Int(colorCount)
 	}
 	var extractedColors: [Color]?
-
 	var isColorExtractionInProgress: Bool = false
 
 }

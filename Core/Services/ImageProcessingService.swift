@@ -19,28 +19,5 @@ struct ImageProcessingSevice: ImageProcessor {
 		guard let uiImage = UIImage(data: data) else { return nil }
 		return uiImage
 	}
-	
-	func saveImageToFiles (image: UIImage) throws -> URL {
-		guard let data = image.jpegData(compressionQuality: 1) else {
-			throw NSError(
-				domain: "",
-				code: 0,
-				userInfo: [NSLocalizedDescriptionKey: "Couldn't convert image to data"]
-			)
-		}
-		
-		let fileManager = FileManager.default
-		let directory = fileManager.urls(
-			for: .documentDirectory,
-			in: .userDomainMask
-		)[0]
-		let filename = UUID().uuidString
-		let fileURL = directory.appendingPathComponent(filename)
-		try data.write(to: fileURL)
-		if fileManager.fileExists(atPath: fileURL.path) {
-		} else {
-		}
-		return fileURL
-	}
 }
 

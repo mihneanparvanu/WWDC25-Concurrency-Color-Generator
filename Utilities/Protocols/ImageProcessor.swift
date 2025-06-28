@@ -11,5 +11,4 @@ import SwiftUI
 protocol ImageProcessor {
 	func extractData (from photo: PhotosPickerItem) async throws -> Data?
 	func getImage(from data: Data?) -> UIImage?
-	func saveImageToFiles (image: UIImage) throws -> URL
 }

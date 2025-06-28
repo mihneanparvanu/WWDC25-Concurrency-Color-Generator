@@ -20,15 +20,15 @@ class ProcessedImage {
 }
 
 extension ProcessedImage {
-	private static var imageProcessor: ImageProcessor = ImageProcessingSevice()
+	private static var fileService: LocalFilesService = LocalFilesService()
 	private static var colorExtractor: ColorExtractor = ColorExtractionService()
 	
 	static func create(from uiImage: UIImage?,
 					   extractingColors colorCount: Int,
-					   imageProcessor: ImageProcessor? = nil,
+					   fileService: LocalFilesService? = nil,
 					   colorExtractor: ColorExtractor? = nil
 	) async throws -> ProcessedImage {
-		let processor = imageProcessor ?? Self.imageProcessor
+		let localFiles = fileService ?? Self.fileService
 		let extractor = colorExtractor ?? Self.colorExtractor
 		
 		guard let uiImage = uiImage else { throw ColorExtractionError .noImageFound }
@@ -40,7 +40,7 @@ extension ProcessedImage {
 		)
 		
 		//Try saving image to files
-		let imageURL = try processor.saveImageToFiles(image: uiImage)
+		let imageURL = try localFiles.saveImage(uiImage)
 		
 		
 		//Create proccessed image
@@ -51,10 +51,10 @@ extension ProcessedImage {
 	
 	func update(with uiImage: UIImage?,
 				colorCount: Int = 5,
-				imageProcessor: ImageProcessor? = nil,
+				fileService: LocalFilesService? = nil,
 				colorExtractor: ColorExtractor? = nil
 	) async throws {
-		let processor = imageProcessor ?? Self.imageProcessor
+		let localFiles = fileService ?? Self.fileService
 		let extractor = colorExtractor ?? Self.colorExtractor
 		
 		guard let uiImage else { throw ColorExtractionError.noImageFound }
@@ -66,7 +66,7 @@ extension ProcessedImage {
 		)
 		
 		//Try saving image to files
-		let newImageURL = try processor.saveImageToFiles(image: uiImage)
+		let newImageURL = try localFiles.saveImage(uiImage)
 		
 		//Update processed image
 		self.imageURL = newImageURL
