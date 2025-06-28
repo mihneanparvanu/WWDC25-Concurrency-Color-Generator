@@ -35,6 +35,9 @@ extension ContentViewViewModel {
 			from: uiImage,
 			extractingColors: intColorCount
 		)
+		extractedColors = ProcessedImageDisplay(
+			processedImage: processedImage
+		).colors
 		isColorExtractionInProgress = false
 		context.insert(processedImage)
 		try context.save()
