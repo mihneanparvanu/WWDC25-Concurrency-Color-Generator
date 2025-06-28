@@ -14,6 +14,9 @@ struct ContentView: View {
 	@State private var vm: ContentViewViewModel
 	@State private var pickerVM: ImagePickerViewModel
 	
+	@State var isColorExtractionInProgress: Bool = false
+	@State var extractedColors : [Color]?
+	
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
 	
@@ -47,23 +50,29 @@ extension ContentView {
 	@ViewBuilder func extractColors () -> some View {
 		VStack {
 			ZStack {
-				if let extractedColors = vm.extractedColors {
+				if let extractedColors = extractedColors {
 					ColorWheelView(colors: extractedColors)
 				}
 				
 				ExtractColorsButton(
 					action: {
 						Task {
-							let processedImage = try await ProcessedImage.create(
+							isColorExtractionInProgress = true
+							let processedImage = try await
+							ProcessedImage.create(
 									image: pickerVM.selectedUIImage,
 									colorCount: colorsCount
 								)
+							isColorExtractionInProgress = false
+							extractedColors = ProcessedImageDisplay(
+								processedImage: processedImage
+							).colors
 							context.insert(processedImage)
 							try context.save()
 						}
 					},
 					colorsCount: colorsCount,
-					isLoading: vm.isColorExtractionInProgress
+					isLoading: isColorExtractionInProgress
 				)
 			}
 			.frame(width: 256, height: 256)

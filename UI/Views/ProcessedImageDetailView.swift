@@ -27,6 +27,14 @@ struct ProcessedImageDetailView: View {
 			sheetView(content: content)
 				.presentationDetents(content.detents)
 		}
+		.onChange(of: pickerVM.selectedImage, {
+			Task {
+				let processedImage = try await ProcessedImage.create(image: pickerVM.selectedUIImage, colorCount: 5)
+				image.imageURL = processedImage.imageURL
+				image.colorHexCodes = processedImage.colorHexCodes
+			}
+			
+		})
 	}
 }
 
