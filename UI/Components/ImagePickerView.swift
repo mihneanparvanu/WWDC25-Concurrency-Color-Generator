@@ -18,18 +18,19 @@ struct ImagePickerView: View {
 		switch mode {
 			case .select:
 				SelectView(
-					selectedItem: $vm.selectedItem,
-					image: vm.selectedImage
+					selectedItem: $vm.selection.item,
+					image: vm.selection.image
 				)
 			case .edit(let currentImage):
 				EditView(
 					currentImage: currentImage,
-					selectedItem: $vm.selectedItem,
-					selectedImage: vm.selectedImage
+					selectedItem: $vm.selection.item,
+					selectedImage: vm.selection.image
 				)
 		}
 	}
 }
+
 
 //MARK: SelectView
 private extension ImagePickerView {
@@ -62,6 +63,7 @@ extension ImagePickerView.SelectView {
 		.frame(height: 64)
 	}
 }
+
 
 //Selected photo
 extension ImagePickerView.SelectView {

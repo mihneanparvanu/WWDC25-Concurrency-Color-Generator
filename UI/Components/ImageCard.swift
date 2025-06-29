@@ -26,6 +26,7 @@ struct ImageCard: View {
 				.resizable()
 				.scaledToFit()
 				.frame(height: 100)
+			
 			HStack {
 				ForEach(displayImage.colors.indices, id: \.self) { index in
 					let doubleIndex = Double(index)
@@ -58,6 +59,7 @@ extension ImageCard {
 		ui.animations.appearAnimation
 	}
 }
+
 
 #Preview {
 	ImageCard(displayImage: ProcessedImageDisplay.preview)

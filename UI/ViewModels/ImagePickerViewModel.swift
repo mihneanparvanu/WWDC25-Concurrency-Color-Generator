@@ -20,35 +20,30 @@ final class ImagePickerViewModel {
 		self.imageProcessor = imageProcessor
 	}
 	
-	var selectedItem: PhotosPickerItem? {
+	//Image selection
+	var selection = SelectedImage() {
 		didSet {
 			Task {
 				do {
 					try await provideSelectedImage()
 				}
 				catch {
-					selectedUIImage = nil
+					selection.uiImage = nil
 				}
 			}
 		}
 	}
-	var selectedUIImage: UIImage?
-	var selectedImage: Image? {
-		if let uiImage = selectedUIImage {
-			return	Image(uiImage: uiImage)
-		}
-		return nil
-	}
+	
 }
 
 //MARK: Display selected image
 extension ImagePickerViewModel {
 	func provideSelectedImage () async throws {
-		guard let selectedItem else {
+		guard let item = selection.item else {
 			throw ImageSelectionError.notFound
 		}
 		do {
-			guard let data = try await imageProcessor.extractData(from: selectedItem) else {
+			guard let data = try await imageProcessor.extractData(from: item) else {
 				throw ImageSelectionError.timeout
 			}
 			
@@ -60,7 +55,7 @@ extension ImagePickerViewModel {
 				throw ImageSelectionError.unsupportedFormat
 			}
 			
-			selectedUIImage = uiImage
+			selection.uiImage = uiImage
 			
 		}
 		catch let error as ImageSelectionError {
@@ -123,3 +118,20 @@ enum ImageSelectionError: Error {
 }
 
 
+extension ImagePickerViewModel {
+	struct SelectedImage {
+		var item: PhotosPickerItem?
+		var uiImage: UIImage?
+		var image: Image? {
+			if let uiImage {
+				return Image(uiImage: uiImage)
+			}
+			return nil
+		}
+		
+		mutating func reset () {
+			item = nil
+			uiImage = nil
+		}
+	}
+}

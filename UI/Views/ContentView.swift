@@ -51,7 +51,7 @@ extension ContentView {
 						Task {
 							try await vm
 								.saveCurrentImage(
-									pickerVM.selectedUIImage,
+									pickerVM.selection.uiImage,
 									in: context)
 							await updateExtractedColors()
 						}
@@ -60,7 +60,7 @@ extension ContentView {
 					isLoading: vm.isExtractingColors
 				)
 			}
-			.onChange(of: pickerVM.selectedItem) {
+			.onChange(of: pickerVM.selection.item) {
 				resetExtractedColors()
 			}
 			.frame(width: 256, height: 256)
@@ -74,11 +74,7 @@ extension ContentView {
 		}
 		.padding()
 	}
-	
-	var selectedImage: UIImage? {
-		pickerVM.selectedUIImage
-	}
-	
+		
 	var colorsCount: Int {
 		vm.intColorCount
 	}
@@ -114,8 +110,6 @@ extension ContentView {
 		extractedColors = nil
 	}
 }
-
-
 
 
 #Preview {

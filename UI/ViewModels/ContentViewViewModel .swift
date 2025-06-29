@@ -49,15 +49,3 @@ extension ContentViewViewModel {
 	}
 }
 
-
-//MARK: Transform data into display images
-extension ContentViewViewModel {
-	func prepareImagesForDisplay (_ processedImages: [ProcessedImage]) -> [ProcessedImageDisplay] {
-		guard processedImages.isNotEmpty else { return [] }
-		
-		return processedImages.compactMap { processedImage in
-			ProcessedImageDisplay(processedImage: processedImage)
-		}
-	}
-}
-

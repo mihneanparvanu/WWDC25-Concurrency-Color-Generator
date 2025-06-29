@@ -27,9 +27,9 @@ struct ProcessedImageDetailView: View {
 			sheetView(content: content)
 				.presentationDetents(content.detents)
 		}
-		.onChange(of: pickerVM.selectedImage, {
+		.onChange(of: pickerVM.selection.uiImage, {
 			Task {
-				try await image.update(with: pickerVM.selectedUIImage)
+				try await image.update(with: pickerVM.selection.uiImage)
 			}
 			
 		})
