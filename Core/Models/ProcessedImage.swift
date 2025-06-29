@@ -12,6 +12,7 @@ import SwiftUI
 class ProcessedImage {
 	var imageURL: URL
 	var colorHexCodes: [String]
+	var dateAdded: Date = Date.now
 	
 	
 	init (imageURL: URL, colorHexCodes: [String]){

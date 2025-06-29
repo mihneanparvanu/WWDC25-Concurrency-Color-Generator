@@ -14,12 +14,14 @@ import SwiftUI
 @Observable
 final class ContentViewViewModel {
 	
+	//Current processed image
+	var currentProcessedImage: ProcessedImage?
+	
 	//Color extraction
 	var colorCount: Double = 5
 	var intColorCount: Int {
 		Int(colorCount)
 	}
-	var extractedColors: [Color]?
 	var isExtractingColors: Bool = false
 }
 
@@ -33,20 +35,20 @@ extension ContentViewViewModel {
 		defer {
 			isExtractingColors = false
 		}
-		let processedImage = try await ProcessedImage.create(
+		
+		currentProcessedImage = try await ProcessedImage.create(
 			from: uiImage,
 			extractingColors: intColorCount
 		)
-		extractedColors = ProcessedImageDisplay(
-			processedImage: processedImage
-		).colors
-		context.insert(processedImage)
+		
+		if let currentProcessedImage {
+			context.insert(currentProcessedImage)
+		}
+
 		try context.save()
 	}
 }
 
-
-//MARK: Save photo to context
 
 //MARK: Transform data into display images
 extension ContentViewViewModel {

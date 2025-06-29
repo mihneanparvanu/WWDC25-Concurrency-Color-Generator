@@ -13,6 +13,7 @@ import SwiftUI
 struct ContentView: View {
 	@State private var vm: ContentViewViewModel
 	@State private var pickerVM: ImagePickerViewModel
+	@State private var extractedColors: [Color]?
 	
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
@@ -41,7 +42,7 @@ extension ContentView {
 	@ViewBuilder func extractColors () -> some View {
 		VStack {
 			ZStack {
-				if let extractedColors = vm.extractedColors {
+				if let extractedColors {
 					ColorWheelView(colors: extractedColors)
 				}
 				
@@ -51,13 +52,16 @@ extension ContentView {
 							try await vm
 								.saveCurrentImage(
 									pickerVM.selectedUIImage,
-									in: context
-								)
+									in: context)
+							await updateExtractedColors()
 						}
 					},
 					colorsCount: colorsCount,
 					isLoading: vm.isExtractingColors
 				)
+			}
+			.onChange(of: pickerVM.selectedItem) {
+				resetExtractedColors()
 			}
 			.frame(width: 256, height: 256)
 			
@@ -99,6 +103,19 @@ extension ContentView {
 		}
 	}
 }
+
+//MARK: Extracted colors
+extension ContentView {
+	func updateExtractedColors () async {
+		extractedColors = vm.currentProcessedImage?.display.colors
+	}
+	
+	func resetExtractedColors () {
+		extractedColors = nil
+	}
+}
+
+
 
 
 #Preview {
