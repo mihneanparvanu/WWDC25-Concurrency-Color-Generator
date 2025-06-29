@@ -18,7 +18,7 @@ struct ProcessedImageDetailView: View {
 	
 	var body: some View {
 		VStack (spacing: 32){
-			ImageCard(displayImage: displayImage,
+			ImageCard(displayImage: image.display,
 					  width: 350)
 			
 			buttons
@@ -65,13 +65,6 @@ extension ProcessedImageDetailView {
 	
 }
 
-//MARK: Display image
-extension ProcessedImageDetailView {
-	var displayImage: ProcessedImageDisplay {
-		ProcessedImageDisplay(processedImage: image)
-	}
-}
-
 
 //MARK: Sheet Logic
 extension ProcessedImageDetailView {
@@ -80,10 +73,12 @@ extension ProcessedImageDetailView {
 			case .edit:
 				ImagePickerView(
 					vm: $pickerVM,
-					mode: .edit(currentImage: displayImage.image)
+					mode: .edit(currentImage: image.display.image)
 				)
 			case .delete:
-				DeleteCurrentImage(image: image, dismissNav: {dismiss()})
+				DeleteCurrentImage(image: image, dismissNav: {
+					dismiss()
+				})
 		}
 	}
 }

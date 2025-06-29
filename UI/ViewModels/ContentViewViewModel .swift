@@ -20,8 +20,7 @@ final class ContentViewViewModel {
 		Int(colorCount)
 	}
 	var extractedColors: [Color]?
-	var isColorExtractionInProgress: Bool = false
-
+	var isExtractingColors: Bool = false
 }
 
 
@@ -30,7 +29,10 @@ extension ContentViewViewModel {
 	func saveCurrentImage(_ uiImage: UIImage?,
 						  in context: ModelContext
 	) async throws {
-		isColorExtractionInProgress = true
+		isExtractingColors = true
+		defer {
+			isExtractingColors = false
+		}
 		let processedImage = try await ProcessedImage.create(
 			from: uiImage,
 			extractingColors: intColorCount
@@ -38,7 +40,6 @@ extension ContentViewViewModel {
 		extractedColors = ProcessedImageDisplay(
 			processedImage: processedImage
 		).colors
-		isColorExtractionInProgress = false
 		context.insert(processedImage)
 		try context.save()
 	}

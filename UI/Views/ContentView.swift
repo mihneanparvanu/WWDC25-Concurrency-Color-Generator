@@ -56,7 +56,7 @@ extension ContentView {
 						}
 					},
 					colorsCount: colorsCount,
-					isLoading: vm.isColorExtractionInProgress
+					isLoading: vm.isExtractingColors
 				)
 			}
 			.frame(width: 256, height: 256)
@@ -65,8 +65,7 @@ extension ContentView {
 				value: $vm.colorCount,
 				in: 1...5,
 				step: 1,
-				onEditingChanged: {editing in
-				}
+				onEditingChanged: {_ in}
 			)
 		}
 		.padding()
@@ -92,9 +91,7 @@ extension ContentView {
 					)
 				){
 					ImageCard(
-						displayImage: ProcessedImageDisplay(
-							processedImage: image
-						)
+						displayImage: image.display
 					)
 				}
 				

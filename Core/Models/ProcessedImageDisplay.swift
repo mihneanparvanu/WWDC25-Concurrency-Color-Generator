@@ -61,4 +61,8 @@ struct ProcessedImageDisplay: Identifiable {
 	)
 }
 
-
+extension ProcessedImage {
+	var display: ProcessedImageDisplay {
+		ProcessedImageDisplay(processedImage: self)
+	}
+}

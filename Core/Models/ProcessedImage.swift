@@ -13,6 +13,7 @@ class ProcessedImage {
 	var imageURL: URL
 	var colorHexCodes: [String]
 	
+	
 	init (imageURL: URL, colorHexCodes: [String]){
 		self.imageURL = imageURL
 		self.colorHexCodes = colorHexCodes
@@ -22,6 +23,8 @@ class ProcessedImage {
 extension ProcessedImage {
 	private static var fileService: LocalFilesService = LocalFilesService()
 	private static var colorExtractor: ColorExtractor = ColorExtractionService()
+	
+	static var isExtractingColors: Bool = false
 	
 	static func create(from uiImage: UIImage?,
 					   extractingColors colorCount: Int,
@@ -41,7 +44,6 @@ extension ProcessedImage {
 		
 		//Try saving image to files
 		let imageURL = try localFiles.saveImage(uiImage)
-		
 		
 		//Create proccessed image
 		return ProcessedImage(
