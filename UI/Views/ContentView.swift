@@ -43,9 +43,7 @@ extension ContentView {
 	@ViewBuilder func extractColors () -> some View {
 		VStack {
 			ZStack {
-				if let extractedColors {
-					ColorWheelView(colors: extractedColors)
-				}
+				ColorWheelView(colors: extractedColors)
 				
 				ExtractColorsButton(
 					action: {
@@ -73,12 +71,14 @@ extension ContentView {
 				value: $vm.colorCount,
 				in: 1...5,
 				step: 1,
-				onEditingChanged: {_ in}
+				onEditingChanged: {_ in
+					resetExtractedColors()
+				}
 			)
 		}
 		.padding()
 	}
-		
+	
 	var colorsCount: Int {
 		vm.intColorCount
 	}
@@ -107,6 +107,7 @@ extension ContentView {
 //MARK: Extracted colors
 extension ContentView {
 	func updateExtractedColors () async {
+		resetExtractedColors()
 		extractedColors = vm.currentProcessedImage?.display.colors
 	}
 	

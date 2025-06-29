@@ -8,17 +8,30 @@
 import SwiftUI
 
 struct ColorWheelView: View {
-	let colors: [Color]
+	let colors: [Color]?
 	let innerRadiusRatio: CGFloat
 	@State private var shouldAnimate = false
+	
 	@Environment(\.uiConstants) private var ui
 	
-	init (colors: [Color], innerRadiusRatio: CGFloat = 0) {
+	init (colors: [Color]?, innerRadiusRatio: CGFloat = 0) {
 		self.colors = colors
 		self.innerRadiusRatio = innerRadiusRatio
 	}
 	
 	var body: some View {
+		if hasColors {
+			colorWheel(colors ?? [])
+		} else {
+			EmptyView()
+		}
+	}
+}
+
+
+//MARK: colorWheel
+extension ColorWheelView {
+	@ViewBuilder func colorWheel(_ colors: [Color]) -> some View {
 		ZStack {
 			ForEach(colors.indices, id: \.self) { index in
 				let indexFloat = Double(index)
@@ -30,40 +43,47 @@ struct ColorWheelView: View {
 					endAngle: endAngle,
 					innerRadiusRatio: innerRadiusRatio
 				)
-				
 				.fill(colors[index])
 				.opacity(shouldAnimate ? 1 : 0)
 				.scaleEffect(shouldAnimate ? 1 : 0.2, anchor: .center)
 				.animation(animation.delay(indexFloat * 0.2),
 						   value: shouldAnimate)
-				.onAppear() {
+				.onAppear {
 					shouldAnimate = true
+					
+					Task {
+						try? await Task.sleep(for: .seconds(indexFloat * 0.2))
+						UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+					}
 				}
-				.onDisappear() {
+				.onDisappear {
 					shouldAnimate = false
 				}
-				.sensoryFeedback(.start, trigger: shouldShowFeedback(for: index))
 			}
+			
 		}
 	}
 }
 
-//MARK: Degrees per segment
+
+//MARK: Useful
 extension ColorWheelView {
+	
+	var hasColors: Bool {
+		colors?.isNotEmpty ?? false
+	}
+	
 	var degreesPerSegment: Double {
-		let segmentCount: Double = Double(colors.count)
+		let segmentCount: Double = Double(colors?.count ?? 0)
 		return 360 / segmentCount
 	}
 }
+
 
 //MARK: Animation
 extension ColorWheelView {
 	var animation: Animation {
 		ui.animations.appearAnimation
-	}
-	
-	private func shouldShowFeedback(for index: Int) -> Bool {
-		shouldAnimate && index < colors.count
 	}
 }
 
@@ -102,4 +122,5 @@ struct WheelSegment: Shape {
 #Preview {
 	ColorWheelView(colors: [.red, .yellow, .blue], innerRadiusRatio: 0)
 }
+
 
