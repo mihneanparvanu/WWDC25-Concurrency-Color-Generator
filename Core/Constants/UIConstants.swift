@@ -20,13 +20,26 @@ struct UIConstants {
 	struct Spacing {
 		let minCornerRadius: CGFloat = 2
 	}
+	
+	//MARK: Haptics
+	let haptics: Haptics
+	struct Haptics {
+		let appear: () -> Void = {
+			UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+		}
+	
+		let buttonPress: () -> Void = {
+			UIImpactFeedbackGenerator(style: .light).impactOccurred()
+		}
+	}
 
 }
 
 private struct UIConstantsKey: EnvironmentKey {
 	static let defaultValue = UIConstants(
 		animations: UIConstants.Animations(),
-		spacing: UIConstants.Spacing()
+		spacing: UIConstants.Spacing(),
+		haptics: UIConstants.Haptics()
 	)
 }
 

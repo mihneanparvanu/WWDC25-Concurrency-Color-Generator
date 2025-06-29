@@ -10,11 +10,11 @@ import SwiftUI
 struct ProcessedImageDetailView: View {
 	@Bindable var image: ProcessedImage
 	@Binding var pickerVM: ImagePickerViewModel
+	@State private var sheetContent: SheetContent?
+	
 	@Environment(\.modelContext) var context
 	@Environment(\.dismiss) var dismiss
-	let colorExtractor = ColorExtractionService()
-	
-	@State private var sheetContent: SheetContent?
+	@Environment(\.uiConstants) var ui
 	
 	var body: some View {
 		VStack (spacing: 32){
@@ -42,6 +42,7 @@ extension ProcessedImageDetailView {
 		HStack (spacing: 16){
 			Button {
 				sheetContent = .edit
+				ui.haptics.buttonPress()
 			} label : {
 				buttonLabel(systemName: "pencil", color: .blue)
 			}

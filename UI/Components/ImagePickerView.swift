@@ -36,6 +36,9 @@ struct ImagePickerView: View {
 private extension ImagePickerView {
 	struct SelectView: View {
 		@Binding var selectedItem: PhotosPickerItem?
+		
+		@Environment(\.uiConstants) var ui
+		
 		let image: Image?
 		var body: some View {
 			VStack {

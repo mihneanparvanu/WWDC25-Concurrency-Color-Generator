@@ -53,7 +53,7 @@ extension ColorWheelView {
 					
 					Task {
 						try? await Task.sleep(for: .seconds(indexFloat * 0.2))
-						UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+						ui.haptics.appear()
 					}
 				}
 				.onDisappear {
