@@ -42,6 +42,7 @@ struct ColorWheelView: View {
 				.onDisappear() {
 					shouldAnimate = false
 				}
+				.sensoryFeedback(.start, trigger: shouldShowFeedback(for: index))
 			}
 		}
 	}
@@ -59,6 +60,10 @@ extension ColorWheelView {
 extension ColorWheelView {
 	var animation: Animation {
 		ui.animations.appearAnimation
+	}
+	
+	private func shouldShowFeedback(for index: Int) -> Bool {
+		shouldAnimate && index < colors.count
 	}
 }
 

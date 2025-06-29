@@ -14,6 +14,7 @@ struct ContentView: View {
 	@State private var vm: ContentViewViewModel
 	@State private var pickerVM: ImagePickerViewModel
 	@State private var extractedColors: [Color]?
+	let soundManager = SoundManager()
 	
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
@@ -59,6 +60,9 @@ extension ContentView {
 					colorsCount: colorsCount,
 					isLoading: vm.isExtractingColors
 				)
+			}
+			.onChange(of: vm.currentProcessedImage) {
+				soundManager.playSound(.applePay)
 			}
 			.onChange(of: pickerVM.selection.item) {
 				resetExtractedColors()
@@ -116,3 +120,11 @@ extension ContentView {
 	ContentView()
 }
 
+#Preview {
+	let soundManager = SoundManager()
+	Button {
+		soundManager.playSound(.applePay)
+	} label: {
+		Text("Play sound")
+	}
+}
