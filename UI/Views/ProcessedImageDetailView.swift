@@ -14,7 +14,6 @@ struct ProcessedImageDetailView: View {
 	
 	@Environment(\.modelContext) var context
 	@Environment(\.dismiss) var dismiss
-	@Environment(\.uiConstants) var ui
 	
 	var body: some View {
 		VStack (spacing: 32){
@@ -42,7 +41,7 @@ extension ProcessedImageDetailView {
 		HStack (spacing: 16){
 			Button {
 				sheetContent = .edit
-				ui.haptics.buttonPress()
+				UI.Haptics.playLightHaptic()
 			} label : {
 				buttonLabel(systemName: "pencil", color: .blue)
 			}

@@ -12,8 +12,6 @@ struct ImagePickerView: View {
 	@Binding var vm: ImagePickerViewModel
 	let mode: ImagePickerMode
 	
-	@Environment(\.uiConstants) var ui
-	
 	var body: some View {
 		switch mode {
 			case .select:
@@ -36,8 +34,6 @@ struct ImagePickerView: View {
 private extension ImagePickerView {
 	struct SelectView: View {
 		@Binding var selectedItem: PhotosPickerItem?
-		
-		@Environment(\.uiConstants) var ui
 		
 		let image: Image?
 		var body: some View {
@@ -97,14 +93,12 @@ private extension ImagePickerView {
 		@Binding var selectedItem: PhotosPickerItem?
 		let selectedImage: Image?
 		
-		@Environment(\.uiConstants) var ui
-		
 		var body: some View {
 				editImage
 					.resizable()
 					.scaledToFit()
 					.frame(width: 100, height: 100)
-					.clipShape(.rect(cornerRadius: ui.spacing.minCornerRadius))
+					.clipShape(.rect(cornerRadius: UI.Spacing.minCornerRadius))
 				
 			PhotosPicker(selection: $selectedItem, label: {
 					Label("Change image", systemImage: "photo")

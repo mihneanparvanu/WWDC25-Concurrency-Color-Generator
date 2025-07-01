@@ -10,10 +10,10 @@ import SwiftUI
 
 
 struct ImageCard: View {
+
 	let displayImage: ProcessedImageDisplay
 	let width: CGFloat
 	@State private var shouldAnimate: Bool = false
-	@Environment(\.uiConstants) private var ui
 	
 	init(displayImage: ProcessedImageDisplay, width: CGFloat = 200) {
 		self.displayImage = displayImage
@@ -56,7 +56,7 @@ struct ImageCard: View {
 //Animation
 extension ImageCard {
 	var animation: Animation {
-		ui.animations.appearAnimation
+		UI.Animations.appearAnimation
 	}
 }
 

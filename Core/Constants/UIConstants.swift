@@ -7,45 +7,31 @@
 
 import SwiftUI
 
-struct UIConstants {
+///UI Constants 
+enum UI {
+
 	//MARK: Animations
-	let animations: Animations
-	struct Animations {
-		let appearAnimation: Animation = .bouncy(duration: 0.3)
+	enum Animations {
+		static let appearAnimation: Animation = .bouncy(duration: 0.3)
 	}
 
 	
 	//MARK: Spacing
-	let spacing: Spacing
-	struct Spacing {
-		let minCornerRadius: CGFloat = 2
+	enum Spacing {
+		static let minCornerRadius: CGFloat = 2
 	}
 	
 	//MARK: Haptics
-	let haptics: Haptics
-	struct Haptics {
-		let appear: () -> Void = {
-			UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+	enum Haptics {
+		private static let softImpact = UIImpactFeedbackGenerator(style: .soft)
+		private static let lightImpact = UIImpactFeedbackGenerator(style: .light)
+		
+		static func playSoftHaptic() {
+			Self.softImpact.impactOccurred()
 		}
-	
-		let buttonPress: () -> Void = {
-			UIImpactFeedbackGenerator(style: .light).impactOccurred()
+		
+		static func playLightHaptic() {
+			Self.lightImpact.impactOccurred()
 		}
-	}
-
-}
-
-private struct UIConstantsKey: EnvironmentKey {
-	static let defaultValue = UIConstants(
-		animations: UIConstants.Animations(),
-		spacing: UIConstants.Spacing(),
-		haptics: UIConstants.Haptics()
-	)
-}
-
-extension EnvironmentValues {
-	var uiConstants: UIConstants {
-		get {self[UIConstantsKey.self]}
-		set {self[UIConstantsKey.self] = newValue}
 	}
 }

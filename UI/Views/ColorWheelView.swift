@@ -12,8 +12,6 @@ struct ColorWheelView: View {
 	let innerRadiusRatio: CGFloat
 	@State private var shouldAnimate = false
 	
-	@Environment(\.uiConstants) private var ui
-	
 	init (colors: [Color]?, innerRadiusRatio: CGFloat = 0) {
 		self.colors = colors
 		self.innerRadiusRatio = innerRadiusRatio
@@ -53,7 +51,7 @@ extension ColorWheelView {
 					
 					Task {
 						try? await Task.sleep(for: .seconds(indexFloat * 0.2))
-						ui.haptics.appear()
+						UI.Haptics.playSoftHaptic()
 					}
 				}
 				.onDisappear {
@@ -83,7 +81,7 @@ extension ColorWheelView {
 //MARK: Animation
 extension ColorWheelView {
 	var animation: Animation {
-		ui.animations.appearAnimation
+		UI.Animations.appearAnimation
 	}
 }
 
