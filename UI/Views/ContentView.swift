@@ -14,7 +14,6 @@ struct ContentView: View {
 	@State private var vm: ContentViewViewModel
 	@State private var pickerVM: ImagePickerViewModel
 	@State private var extractedColors: [Color]?
-	let soundManager = SoundManager()
 	
 	@Query var images: [ProcessedImage]
 	@Environment(\.modelContext) var context
@@ -116,6 +115,12 @@ extension ContentView {
 	}
 }
 
+//MARK: Sound Manager
+extension ContentView {
+	var soundManager: SoundManager {
+		.init()
+	}
+}
 
 #Preview {
 	ContentView()
