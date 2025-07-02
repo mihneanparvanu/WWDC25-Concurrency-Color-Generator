@@ -56,12 +56,12 @@ struct ImageCard: View {
 //Animation
 extension ImageCard {
 	var animation: Animation {
-		UI.Animations.appearAnimation
+		UI.Constants.Animations.appearAnimation
 	}
 }
 
 
 #Preview {
-	ImageCard(displayImage: ProcessedImageDisplay.preview)
+	ImageCard(displayImage: .preview())
 }
 

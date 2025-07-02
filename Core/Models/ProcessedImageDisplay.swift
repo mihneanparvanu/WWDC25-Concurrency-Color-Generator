@@ -52,17 +52,19 @@ struct ProcessedImageDisplay: Identifiable {
 				return nil
 		}
 	}
-	
-	static let preview = ProcessedImageDisplay(
-		processedImage: ProcessedImage(
-			imageURL: URL(fileURLWithPath: "/dev/null"),
-			colorHexCodes: ["#D687F4", "#6495F9", "#4BF1B0"]
-		)
-	)
 }
 
 extension ProcessedImage {
 	var display: ProcessedImageDisplay {
 		ProcessedImageDisplay(processedImage: self)
+	}
+}
+
+extension ProcessedImageDisplay {
+	static func preview (processedImage: ProcessedImage = .init(
+		imageURL: URL(fileURLWithPath: "/dev/null"),
+		   colorHexCodes: ["#D687F4", "#6495F9", "#4BF1B0"])
+	) -> Self {
+		.init(processedImage: processedImage)
 	}
 }

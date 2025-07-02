@@ -20,7 +20,7 @@ struct ContentView: View {
 	@Environment(\.modelContext) var context
 	
 	init () {
-		let imageProcessor = ImageProcessingSevice()
+		let imageProcessor = ImageProcessingService()
 		self.vm = ContentViewViewModel()
 		self.pickerVM = ImagePickerViewModel(imageProcessor: imageProcessor)
 	}
@@ -28,7 +28,7 @@ struct ContentView: View {
 	var body: some View {
 		NavigationStack {
 			ScrollView {
-				ImagePickerView(vm: $pickerVM, mode: .select)
+				ImagePickerView(vm: pickerVM, mode: .select)
 				
 				extractColors()
 				
@@ -91,7 +91,7 @@ extension ContentView {
 			ForEach (images) { image in
 				NavigationLink (
 					destination: ProcessedImageDetailView(
-						image: image, pickerVM: $pickerVM
+						image: image, pickerVM: pickerVM
 					)
 				){
 					ImageCard(
@@ -121,11 +121,3 @@ extension ContentView {
 	ContentView()
 }
 
-#Preview {
-	let soundManager = SoundManager()
-	Button {
-		soundManager.playSound(.applePay)
-	} label: {
-		Text("Play sound")
-	}
-}

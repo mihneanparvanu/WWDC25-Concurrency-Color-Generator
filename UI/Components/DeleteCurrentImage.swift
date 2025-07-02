@@ -63,6 +63,6 @@ extension DeleteCurrentImage {
 }
 
 #Preview {
-	let displayImage = ProcessedImageDisplay.preview
-	DeleteCurrentImage(image: displayImage.processedImage, dismissNav: {})
+	let image = ProcessedImageDisplay.preview().processedImage
+	DeleteCurrentImage(image: image, dismissNav: {})
 }

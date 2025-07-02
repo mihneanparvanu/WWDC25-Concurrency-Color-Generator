@@ -9,7 +9,7 @@ import PhotosUI
 import SwiftUI
 
 struct ImagePickerView: View {
-	@Binding var vm: ImagePickerViewModel
+	@Bindable var vm: ImagePickerViewModel
 	let mode: ImagePickerMode
 	
 	var body: some View {
@@ -98,7 +98,11 @@ private extension ImagePickerView {
 					.resizable()
 					.scaledToFit()
 					.frame(width: 100, height: 100)
-					.clipShape(.rect(cornerRadius: UI.Spacing.minCornerRadius))
+					.clipShape(
+						.rect(
+							cornerRadius: UI.Constants.Spacing.minCornerRadius
+						)
+					)
 				
 			PhotosPicker(selection: $selectedItem, label: {
 					Label("Change image", systemImage: "photo")
@@ -125,18 +129,18 @@ enum ImagePickerMode {
 
 
 #Preview {
-	@Previewable @State var vm = ImagePickerViewModel(imageProcessor: ImageProcessingSevice())
+	@Previewable @State var vm = ImagePickerViewModel(imageProcessor: ImageProcessingService())
 	
-	ImagePickerView(vm: $vm, mode: .select)
+	ImagePickerView(vm: vm, mode: .select)
 	
 }
 
 #Preview {
-	@Previewable @State var vm = ImagePickerViewModel(imageProcessor: ImageProcessingSevice())
-	let image = ProcessedImageDisplay.preview.image
+	@Previewable @State var vm = ImagePickerViewModel(imageProcessor: ImageProcessingService())
+	let image = ProcessedImageDisplay.preview().image
 	
 	ImagePickerView(
-		vm: $vm,
+		vm: vm,
 		mode: .edit(currentImage: image)
 	)
 }

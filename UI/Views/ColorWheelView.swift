@@ -51,14 +51,13 @@ extension ColorWheelView {
 					
 					Task {
 						try? await Task.sleep(for: .seconds(indexFloat * 0.2))
-						UI.Haptics.playSoftHaptic()
+						UI.Constants.Haptics.playSoftHaptic()
 					}
 				}
 				.onDisappear {
 					shouldAnimate = false
 				}
 			}
-			
 		}
 	}
 }
@@ -81,7 +80,7 @@ extension ColorWheelView {
 //MARK: Animation
 extension ColorWheelView {
 	var animation: Animation {
-		UI.Animations.appearAnimation
+		UI.Constants.Animations.appearAnimation
 	}
 }
 

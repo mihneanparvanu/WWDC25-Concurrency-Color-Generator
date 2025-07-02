@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProcessedImageDetailView: View {
 	@Bindable var image: ProcessedImage
-	@Binding var pickerVM: ImagePickerViewModel
+	@Bindable var pickerVM: ImagePickerViewModel
 	@State private var sheetContent: SheetContent?
 	
 	@Environment(\.modelContext) var context
@@ -30,7 +30,6 @@ struct ProcessedImageDetailView: View {
 			Task {
 				try await image.update(with: pickerVM.selection.uiImage)
 			}
-			
 		})
 	}
 }
@@ -41,7 +40,7 @@ extension ProcessedImageDetailView {
 		HStack (spacing: 16){
 			Button {
 				sheetContent = .edit
-				UI.Haptics.playLightHaptic()
+				UI.Constants.Haptics.playLightHaptic()
 			} label : {
 				buttonLabel(systemName: "pencil", color: .blue)
 			}
@@ -65,14 +64,13 @@ extension ProcessedImageDetailView {
 	
 }
 
-
 //MARK: Sheet Logic
 extension ProcessedImageDetailView {
 	@ViewBuilder func sheetView(content: SheetContent) -> some View {
 		switch content {
 			case .edit:
 				ImagePickerView(
-					vm: $pickerVM,
+					vm: pickerVM,
 					mode: .edit(currentImage: image.display.image)
 				)
 			case .delete:
@@ -82,7 +80,6 @@ extension ProcessedImageDetailView {
 		}
 	}
 }
-
 
 enum SheetContent: String, Identifiable {
 	case edit, delete
@@ -104,17 +101,17 @@ enum SheetContent: String, Identifiable {
 
 
 #Preview {
-	@Previewable @State var pickerVM = ImagePickerViewModel(imageProcessor: ImageProcessingSevice())
-	let image = ProcessedImageDisplay.preview.processedImage
+	@Previewable @State var pickerVM = ImagePickerViewModel(imageProcessor: ImageProcessingService())
+	let image = ProcessedImageDisplay.preview().processedImage
 	
 	ProcessedImageDetailView(image: image,
-							 pickerVM: $pickerVM)
+							 pickerVM: pickerVM)
 	
 }
 
 #Preview {
-	@Previewable @State var pickerVM = ImagePickerViewModel(imageProcessor: ImageProcessingSevice())
+	@Previewable @State var pickerVM = ImagePickerViewModel(imageProcessor: ImageProcessingService())
 	
-	let image = ProcessedImageDisplay.preview.image
-	ImagePickerView(vm: $pickerVM, mode: .edit(currentImage: image))
+	let image = ProcessedImageDisplay.preview().image
+	ImagePickerView(vm: pickerVM, mode: .edit(currentImage: image))
 }

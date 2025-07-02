@@ -7,31 +7,48 @@
 
 import SwiftUI
 
-///UI Constants 
-enum UI {
 
-	//MARK: Animations
-	enum Animations {
-		static let appearAnimation: Animation = .bouncy(duration: 0.3)
-	}
-
-	
-	//MARK: Spacing
-	enum Spacing {
-		static let minCornerRadius: CGFloat = 2
-	}
-	
-	//MARK: Haptics
-	enum Haptics {
-		private static let softImpact = UIImpactFeedbackGenerator(style: .soft)
-		private static let lightImpact = UIImpactFeedbackGenerator(style: .light)
+///UI Constants
+struct UI {
+	private init() {}
+	struct Theme {
+		let primaryColor: Color
+		let secondaryColor: Color
+		let accentColor: Color
 		
-		static func playSoftHaptic() {
-			Self.softImpact.impactOccurred()
+		static let light = Theme(primaryColor: .blue,
+							   secondaryColor: .white,
+							   accentColor: .orange)
+		static let dark = Theme(primaryColor: .white,
+							  secondaryColor: .black,
+							  accentColor: .orange)
+	}
+
+	
+	enum Constants {
+		
+		//MARK: Spacing
+		enum Spacing {
+			static let minCornerRadius: CGFloat = 2
 		}
 		
-		static func playLightHaptic() {
-			Self.lightImpact.impactOccurred()
+		//MARK: Animations
+		enum Animations {
+			static let appearAnimation: Animation = .bouncy(duration: 0.3)
+		}
+		
+		//MARK: Haptics
+		enum Haptics {
+			private static let softImpact = UIImpactFeedbackGenerator(style: .soft)
+			private static let lightImpact = UIImpactFeedbackGenerator(style: .light)
+			
+			static func playSoftHaptic() {
+				Self.softImpact.impactOccurred()
+			}
+			
+			static func playLightHaptic() {
+				Self.lightImpact.impactOccurred()
+			}
 		}
 	}
 }
